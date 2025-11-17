@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI to ZX 🧠 🌈 📼</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .emulator-container {
+            text-align: center;
+            margin: 20px 0;
+            border: 2px solid #333;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #222;
+            position: relative;
+        }
+        
+        .emulator-status {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 14px;
+            text-align: center;
+            z-index: 10;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .demo-list {
+            margin: 20px 0;
+        }
+        
+        .demo-list h2 {
+            color: #555;
+            margin-bottom: 15px;
+        }
+        
+        .demo-item {
+            display: block;
+            margin: 10px 0;
+            padding: 10px 15px;
+            background-color: #e8e8e8;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #333;
+            transition: background-color 0.3s;
+        }
+        
+        .demo-item:hover {
+            background-color: #d0d0d0;
+        }
+        
+        .instructions {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #007acc;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .instructions h3 {
+            margin-top: 0;
+            color: #007acc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI to ZX 🧠 🌈 📼</h1>
+        <p style="text-align: center; color: #666; font-size: 1.1em; margin-bottom: 30px; font-style: italic;">
+            Bridging the gap between artificial intelligence and retro computing.<br>
+        </p>
+        
+        <div class="instructions">
+            <h3>Instructions</h3>
+            <ul>
+                <li>Click on a demo below to load it into the ZX Spectrum emulator</li>
+                <li>The emulator will start automatically once a program is loaded</li>
+                <li>Use the built-in controls to pause/play, reset, or enter fullscreen</li>
+                <li>Press F11 or use the fullscreen button for the best experience</li>
+            </ul>
+        </div>
+        
+        <div class="emulator-container">
+            <div id="emulator-status" class="emulator-status">Loading emulator...</div>
+            <div id="jsspeccy"></div>
+        </div>
+        
+        <div class="demo-list">
+            <h2>Available Demos</h2>
+            <div id="demo-links">
+                <!-- Demo links will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script src="libs/jsspeccy/jsspeccy.js"></script>
+    <script>
+        let emulator;
+        
+        // Initialize the emulator
+        function initEmulator() {
+            const container = document.getElementById('jsspeccy');
+            
+            emulator = JSSpeccy(container, {
+                machine: 48,             // Start with ZX Spectrum 48K
+                autoStart: false,        // Don't start until we load a program
+                zoom: 2,                 // 2x zoom for better visibility
+                tapeTrapsEnabled: true,  // Enable fast tape loading
+                autoLoadTapes: true      // Automatically load tapes when opened
+            });
+            
+            emulator.onReady(() => {
+                showStatus('Emulator ready - click a demo to load it');
+                loadDemoList();
+            });
+        }
+        
+        // Load the list of available demos
+        async function loadDemoList() {
+            try {
+                const demoLinksContainer = document.getElementById('demo-links');
+                
+                // Start with empty demos array
+                const demos = [];
+                
+                // Load descriptions from JSON file
+                let descriptions = {};
+                try {
+                    const descResponse = await fetch('demos/descriptions.json');
+                    if (descResponse.ok) {
+                        descriptions = await descResponse.json();
+                    }
+                } catch (e) {
+                    console.log('Could not load descriptions.json, using defaults');
+                }
+                
+                // Check if demos directory exists and get file list
+                try {
+                    const response = await fetch('demos/');
+                    if (response.ok) {
+                        const html = await response.text();
+                        // Parse HTML to find .tap files
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const links = doc.querySelectorAll('a[href$=".tap"]');
+                        
+                        // Clear demos array and rebuild from server
+                        demos.length = 0;
+                        links.forEach(link => {
+                            const filename = link.getAttribute('href');
+                            const name = filename.replace('.tap', '').replace(/[-_]/g, ' ');
+                            const description = descriptions[filename] || '';
+                            
+                            demos.push({
+                                name: name.charAt(0).toUpperCase() + name.slice(1),
+                                file: filename,
+                                description: description
+                            });
+                        });
+                    }
+                } catch (e) {
+                    console.log('Could not fetch demo directory');
+                }
+                
+                // Create demo links
+                demos.forEach(demo => {
+                    const link = document.createElement('a');
+                    link.href = '#';
+                    link.className = 'demo-item';
+                    
+                    if (demo.description) {
+                        link.innerHTML = `<strong>${demo.name}</strong><br><small>${demo.description}</small>`;
+                    } else {
+                        link.innerHTML = `<strong>${demo.name}</strong>`;
+                    }
+                    
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        loadDemo(demo.file, demo.name);
+                    });
+                    
+                    demoLinksContainer.appendChild(link);
+                });
+                
+                if (demos.length === 0) {
+                    demoLinksContainer.innerHTML = '<p>No demos available!</p>';
+                }
+                
+            } catch (error) {
+                console.error('Error loading demo list:', error);
+                document.getElementById('demo-links').innerHTML = '<p>Error loading demos</p>';
+            }
+        }
+        
+        // Show status message in emulator overlay
+        function showStatus(message, duration = 3000) {
+            const statusEl = document.getElementById('emulator-status');
+            statusEl.innerHTML = message;
+            statusEl.style.opacity = '1';
+            
+            if (duration > 0) {
+                setTimeout(() => {
+                    statusEl.style.opacity = '0';
+                }, duration);
+            }
+        }
+        
+        // Load a specific demo
+        async function loadDemo(filename, name) {
+            try {
+                showStatus(`Loading ${name}...`, 0);
+                
+                const url = `demos/${filename}`;
+                await emulator.openUrl(url);
+                
+                showStatus(`<b>${name}</b> loaded and running!`);
+                
+            } catch (error) {
+                console.error('Error loading demo:', error);
+                showStatus(`Error loading ${name}: ${error}`, 5000);
+            }
+        }
+        
+        // Initialize when the page loads
+        document.addEventListener('DOMContentLoaded', initEmulator);
+    </script>
+</body>
+</html>
