@@ -149,59 +149,29 @@
             try {
                 const demoLinksContainer = document.getElementById('demo-links');
                 
-                // Start with empty demos array
-                const demos = [];
-                
                 // Load descriptions from JSON file
-                let descriptions = {};
-                try {
-                    const descResponse = await fetch('demos/descriptions.json');
-                    if (descResponse.ok) {
-                        descriptions = await descResponse.json();
-                    }
-                } catch (e) {
-                    console.log('Could not load descriptions.json, using defaults');
+                const descResponse = await fetch('demos/descriptions.json');
+                if (!descResponse.ok) {
+                    throw new Error('Could not load descriptions.json');
                 }
                 
-                // Check if demos directory exists and get file list
-                try {
-                    const response = await fetch('demos/');
-                    if (response.ok) {
-                        const html = await response.text();
-                        // Parse HTML to find .tap files
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        const links = doc.querySelectorAll('a[href$=".tap"]');
-                        
-                        // Clear demos array and rebuild from server
-                        demos.length = 0;
-                        links.forEach(link => {
-                            const filename = link.getAttribute('href');
-                            const name = filename.replace('.tap', '').replace(/[-_]/g, ' ');
-                            const description = descriptions[filename] || '';
-                            
-                            demos.push({
-                                name: name.charAt(0).toUpperCase() + name.slice(1),
-                                file: filename,
-                                description: description
-                            });
-                        });
-                    }
-                } catch (e) {
-                    console.log('Could not fetch demo directory');
-                }
+                const descriptions = await descResponse.json();
+
+                const demos = Object.entries(descriptions).map(([filename, description]) => {
+                    const name = filename.replace('.tap', '').replace(/[-_]/g, ' ');
+                    return {
+                        name: name.charAt(0).toUpperCase() + name.slice(1),
+                        file: filename,
+                        description: description
+                    };
+                });
                 
                 // Create demo links
                 demos.forEach(demo => {
                     const link = document.createElement('a');
                     link.href = '#';
                     link.className = 'demo-item';
-                    
-                    if (demo.description) {
-                        link.innerHTML = `<strong>${demo.name}</strong><br><small>${demo.description}</small>`;
-                    } else {
-                        link.innerHTML = `<strong>${demo.name}</strong>`;
-                    }
+                    link.innerHTML = `<strong>${demo.name}</strong><br><small>${demo.description}</small>`;
                     
                     link.addEventListener('click', (e) => {
                         e.preventDefault();
@@ -217,7 +187,7 @@
                 
             } catch (error) {
                 console.error('Error loading demo list:', error);
-                document.getElementById('demo-links').innerHTML = '<p>Error loading demos</p>';
+                document.getElementById('demo-links').innerHTML = '<p>Error loading demos. Make sure descriptions.json is available.</p>';
             }
         }
         
