@@ -69,11 +69,14 @@ To build and run this project locally, you'll need the following tools installed
 * (Hartnell, 1984) [Exploring Artificial Intelligence on your Spectrum+ and Spectrum](https://archive.org/details/timhartnellvz200giantbookofgames/TimHartnell_ExploringArtificialIntelligenceOnYourSpectrum/)
 * (Jones & Fairhurst, 1984) [Artificial Intelligence: ZX Spectrum](https://spectrumcomputing.co.uk/entry/2000463/Book/Artificial_Intelligence_ZX_Spectrum)
 
-### Websites
+### Blogs
 
-* [DevOps for the Sinclair Spectrum - Part 1](https://www.markround.com/blog/2021/12/21/devops-for-the-sinclair-spectrum-part-1)
+* (CppCMS, 2019) [Modern AI and Deep Learning on ZX Spectrum](https://blog.cppcms.com/post/125)
+* (MarkRound, 2021) [DevOps for the Sinclair Spectrum - Part 1](https://www.markround.com/blog/2021/12/21/devops-for-the-sinclair-spectrum-part-1)
+* (MrKWatkins, 2025a) [Teaching an AI to Play ZX Spectrum Games](https://www.mrkwatkins.co.uk/teaching-an-ai-to-play-zx-spectrum-games/)
+* (MrKWatkins, 2025b) [More on Teaching an AI to Play ZX Spectrum Games](https://www.mrkwatkins.co.uk/more-on-teaching-an-ai-to-play-zx-spectrum-games/)
 
 ### Tools & Software
 
-* **[ZX BASIC](https://zxbasic.readthedocs.io/)**: a BASIC cross-compiler for the ZX Spectrum
-* **[JSSpeccy](https://github.com/gasman/jsspeccy3)** - A JavaScript-based ZX Spectrum emulator that runs in web browsers
+* [ZX BASIC](https://zxbasic.readthedocs.io/) - a BASIC cross-compiler for the ZX Spectrum
+* [JSSpeccy](https://github.com/gasman/jsspeccy3) - A JavaScript-based ZX Spectrum emulator that runs in web browsers
