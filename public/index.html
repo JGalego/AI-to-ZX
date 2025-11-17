@@ -53,29 +53,137 @@
             transition: opacity 0.3s ease;
         }
         
-        .demo-list {
+        .demo-controls {
             margin: 20px 0;
+            text-align: center;
         }
         
-        .demo-list h2 {
+        .demo-controls h2 {
             color: #555;
             margin-bottom: 15px;
         }
         
-        .demo-item {
-            display: block;
-            margin: 10px 0;
-            padding: 10px 15px;
-            background-color: #e8e8e8;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            text-decoration: none;
-            color: #333;
-            transition: background-color 0.3s;
+        .demo-selector {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
         }
         
-        .demo-item:hover {
-            background-color: #d0d0d0;
+        .custom-dropdown {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+        
+        .dropdown-header {
+            padding: 12px 15px;
+            font-size: 14px;
+            border: 2px solid #007acc;
+            border-radius: 5px;
+            background-color: white;
+            color: #333;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        .dropdown-header:hover {
+            border-color: #005a9e;
+        }
+        
+        .dropdown-header.active {
+            border-color: #005a9e;
+            box-shadow: 0 0 5px rgba(0, 122, 204, 0.3);
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        
+        .dropdown-arrow {
+            transition: transform 0.3s;
+            font-size: 12px;
+            color: #007acc;
+        }
+        
+        .dropdown-header.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+        
+        .dropdown-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #005a9e;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .dropdown-options.show {
+            display: block;
+        }
+        
+        .dropdown-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+        
+        .dropdown-option:last-child {
+            border-bottom: none;
+        }
+        
+        .dropdown-option:hover {
+            background-color: #f0f8ff;
+        }
+        
+        .dropdown-option.selected {
+            background-color: #e6f3ff;
+        }
+        
+        .demo-name {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .demo-desc {
+            color: #666;
+            font-size: 13px;
+            margin-top: 2px;
+        }
+        
+        .load-button {
+            padding: 12px 25px;
+            font-size: 14px;
+            font-weight: bold;
+            background-color: #007acc;
+            color: white;
+            border: 2px solid #007acc;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .load-button:hover:not(:disabled) {
+            background-color: #005a9e;
+            border-color: #005a9e;
+        }
+        
+        .load-button:disabled {
+            background-color: #ccc;
+            border-color: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
         }
         
         .instructions {
@@ -102,7 +210,8 @@
         <div class="instructions">
             <h3>Instructions</h3>
             <ul>
-                <li>Click on a demo below to load it into the ZX Spectrum emulator</li>
+                <li>Select a demo from the dropdown list below</li>
+                <li>Click "Load Tape" to load it into the ZX Spectrum emulator</li>
                 <li>The emulator will start automatically once a program is loaded</li>
                 <li>Use the built-in controls to pause/play, reset, or enter fullscreen</li>
                 <li>Press F11 or use the fullscreen button for the best experience</li>
@@ -114,10 +223,18 @@
             <div id="jsspeccy"></div>
         </div>
         
-        <div class="demo-list">
-            <h2>Available Demos</h2>
-            <div id="demo-links">
-                <!-- Demo links will be populated by JavaScript -->
+        <div class="demo-controls">
+            <div class="demo-selector">
+                <div id="custom-dropdown" class="custom-dropdown">
+                    <div id="dropdown-header" class="dropdown-header">
+                        <span id="dropdown-text">Choose a demo...</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div id="dropdown-options" class="dropdown-options">
+                        <!-- Options will be populated by JavaScript -->
+                    </div>
+                </div>
+                <button id="load-button" class="load-button" disabled>Load Tape</button>
             </div>
         </div>
     </div>
@@ -139,15 +256,22 @@
             });
             
             emulator.onReady(() => {
-                showStatus('Emulator ready - click a demo to load it');
+                showStatus('Emulator ready - select a demo to load it');
                 loadDemoList();
             });
         }
         
+        // Store loaded demos for later use
+        let availableDemos = [];
+        let selectedDemo = null;
+        
         // Load the list of available demos
         async function loadDemoList() {
             try {
-                const demoLinksContainer = document.getElementById('demo-links');
+                const dropdownHeader = document.getElementById('dropdown-header');
+                const dropdownText = document.getElementById('dropdown-text');
+                const dropdownOptions = document.getElementById('dropdown-options');
+                const loadButton = document.getElementById('load-button');
                 
                 // Load descriptions from JSON file
                 const descResponse = await fetch('demos/descriptions.json');
@@ -157,7 +281,7 @@
                 
                 const descriptions = await descResponse.json();
 
-                const demos = Object.entries(descriptions).map(([filename, description]) => {
+                availableDemos = Object.entries(descriptions).map(([filename, description]) => {
                     const name = filename.replace('.tap', '').replace(/[-_]/g, ' ');
                     return {
                         name: name.charAt(0).toUpperCase() + name.slice(1),
@@ -166,29 +290,80 @@
                     };
                 });
                 
-                // Create demo links
-                demos.forEach(demo => {
-                    const link = document.createElement('a');
-                    link.href = '#';
-                    link.className = 'demo-item';
-                    link.innerHTML = `<strong>${demo.name}</strong><br><small>${demo.description}</small>`;
+                // Populate custom dropdown
+                availableDemos.forEach(demo => {
+                    const option = document.createElement('div');
+                    option.className = 'dropdown-option';
+                    option.dataset.value = demo.file;
+                    option.innerHTML = `
+                        <div class="demo-name">${demo.name}</div>
+                        <div class="demo-desc">${demo.description}</div>
+                    `;
                     
-                    link.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        loadDemo(demo.file, demo.name);
+                    option.addEventListener('click', function() {
+                        selectDemo(demo, this);
                     });
                     
-                    demoLinksContainer.appendChild(link);
+                    dropdownOptions.appendChild(option);
                 });
                 
-                if (demos.length === 0) {
-                    demoLinksContainer.innerHTML = '<p>No demos available!</p>';
+                // Add dropdown toggle functionality
+                dropdownHeader.addEventListener('click', function() {
+                    const isActive = this.classList.contains('active');
+                    if (isActive) {
+                        closeDropdown();
+                    } else {
+                        openDropdown();
+                    }
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!e.target.closest('.custom-dropdown')) {
+                        closeDropdown();
+                    }
+                });
+                
+                // Load button functionality
+                loadButton.addEventListener('click', function() {
+                    if (selectedDemo) {
+                        loadDemo(selectedDemo.file, selectedDemo.name);
+                    }
+                });
+                
+                if (availableDemos.length === 0) {
+                    dropdownText.textContent = 'No demos available!';
                 }
                 
             } catch (error) {
                 console.error('Error loading demo list:', error);
-                document.getElementById('demo-links').innerHTML = '<p>Error loading demos. Make sure descriptions.json is available.</p>';
+                document.getElementById('dropdown-text').textContent = 'Error loading demos';
             }
+        }
+        
+        // Helper functions for custom dropdown
+        function selectDemo(demo, optionElement) {
+            selectedDemo = demo;
+            document.getElementById('dropdown-text').innerHTML = `<strong>${demo.name}</strong> - ${demo.description}`;
+            document.getElementById('load-button').disabled = false;
+            
+            // Update selected state
+            document.querySelectorAll('.dropdown-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            optionElement.classList.add('selected');
+            
+            closeDropdown();
+        }
+        
+        function openDropdown() {
+            document.getElementById('dropdown-header').classList.add('active');
+            document.getElementById('dropdown-options').classList.add('show');
+        }
+        
+        function closeDropdown() {
+            document.getElementById('dropdown-header').classList.remove('active');
+            document.getElementById('dropdown-options').classList.remove('show');
         }
         
         // Show status message in emulator overlay
