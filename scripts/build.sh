@@ -9,7 +9,18 @@ fi
 # Function to extract description from BASIC file
 get_description() {
     local file="$1"
-    head -10 "$file" | grep -i "^[0-9]*.*REM.*DESC\|^[0-9]*.*REM.*DESCRIPTION" | sed 's/^[0-9]*.*REM.*DESC[RIPTION]*[[:space:]]*[:]*[[:space:]]*//' | head -1
+    head -20 "$file" | grep -i "^[0-9]*.*REM.*DESC\|^[0-9]*.*REM.*DESCRIPTION" | sed 's/^[0-9]*.*REM.*DESC[RIPTION]*[[:space:]]*[:]*[[:space:]]*//' | head -1
+}
+
+# Function to extract category from BASIC file
+get_category() {
+    local file="$1"
+    local category=$(head -20 "$file" | grep -i "^[0-9]*.*REM.*CATEGORY" | sed 's/^[0-9]*.*REM.*CATEGORY[[:space:]]*[:]*[[:space:]]*//' | head -1)
+    if [ -n "$category" ]; then
+        echo "$category"
+    else
+        echo "Miscellaneous"
+    fi
 }
 
 # Function to build descriptions JSON using jq
@@ -22,15 +33,16 @@ build_descriptions() {
             if [ -f "$tap_file" ]; then
                 basename=$(basename "$bas_file" .bas)
                 desc=$(get_description "$bas_file")
+                category=$(get_category "$bas_file")
                 
                 if [ -n "$desc" ]; then
-                    jq --arg key "$basename.tap" --arg value "$desc" '. + {($key): $value}' "./public/demos/descriptions.json" > tmp.json && mv tmp.json "./public/demos/descriptions.json"
+                    jq --arg key "$basename.tap" --arg desc "$desc" --arg cat "$category" '. + {($key): {description: $desc, category: $cat}}' "./public/demos/descriptions.json" > tmp.json && mv tmp.json "./public/demos/descriptions.json"
                 fi
             fi
         fi
     done
     
-    echo "Generated descriptions file"
+    echo "Generated descriptions file with categories"
 }
 
 if [ -n "$1" ]; then

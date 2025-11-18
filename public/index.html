@@ -151,6 +151,33 @@
             background-color: #e6f3ff;
         }
         
+        .dropdown-category {
+            padding: 8px 15px;
+            font-weight: bold;
+            color: #007acc;
+            background-color: #f0f8ff;
+            border-bottom: 1px solid #ddd;
+            cursor: default;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .dropdown-option.demo-item {
+            padding-left: 30px;
+            border-left: 3px solid transparent;
+        }
+        
+        .dropdown-option.demo-item:hover {
+            background-color: #f0f8ff;
+            border-left-color: #007acc;
+        }
+        
+        .dropdown-option.demo-item.selected {
+            background-color: #e6f3ff;
+            border-left-color: #005a9e;
+        }
+        
         .demo-name {
             font-weight: bold;
             color: #333;
@@ -202,7 +229,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>AI to ZX 🧠 🌈 📼</h1>
+        <h1>AI to ZX 🧠🌈</h1>
         <p style="text-align: center; color: #666; font-size: 1.1em; margin-bottom: 30px; font-style: italic;">
             Bridging the gap between artificial intelligence and retro computing.<br>
         </p>
@@ -231,10 +258,10 @@
             <h3>Instructions</h3>
             <ul>
                 <li>Select a demo from the dropdown list above</li>
-                <li>Click "Load Tape" to load it into the ZX Spectrum emulator</li>
+                <li>Click <b>Load Tape 📼</b> to load it into the ZX Spectrum emulator</li>
                 <li>The emulator will start automatically once a program is loaded</li>
-                <li>Use the built-in controls to pause/play, reset, or enter fullscreen</li>
-                <li>Press F11 or use the fullscreen button for the best experience</li>
+                <li>Use the built-in controls to pause ⏸️, play ▶️, reset 🔄, or enter fullscreen</li>
+                <li>Press <b>F11</b> or use the fullscreen button for the best experience</li>
             </ul>
         </div>
     </div>
@@ -281,30 +308,68 @@
                 
                 const descriptions = await descResponse.json();
 
-                availableDemos = Object.entries(descriptions).map(([filename, description]) => {
+                // Parse demos and organize by category
+                availableDemos = Object.entries(descriptions).map(([filename, demoData]) => {
                     const name = filename.replace('.tap', '').replace(/[-_]/g, ' ');
+                    
+                    // Handle both old format (string) and new format (object)
+                    let description, category;
+                    if (typeof demoData === 'string') {
+                        description = demoData;
+                        category = 'Miscellaneous';
+                    } else {
+                        description = demoData.description || 'No description available';
+                        category = demoData.category || 'Miscellaneous';
+                    }
+                    
                     return {
                         name: name.charAt(0).toUpperCase() + name.slice(1),
                         file: filename,
-                        description: description
+                        description: description,
+                        category: category
                     };
                 });
                 
-                // Populate custom dropdown
+                // Group demos by category
+                const categorizedDemos = {};
                 availableDemos.forEach(demo => {
-                    const option = document.createElement('div');
-                    option.className = 'dropdown-option';
-                    option.dataset.value = demo.file;
-                    option.innerHTML = `
-                        <div class="demo-name">${demo.name}</div>
-                        <div class="demo-desc">${demo.description}</div>
-                    `;
+                    if (!categorizedDemos[demo.category]) {
+                        categorizedDemos[demo.category] = [];
+                    }
+                    categorizedDemos[demo.category].push(demo);
+                });
+                
+                // Sort categories alphabetically, but put "Miscellaneous" last
+                const sortedCategories = Object.keys(categorizedDemos).sort((a, b) => {
+                    if (a === 'Miscellaneous') return 1;
+                    if (b === 'Miscellaneous') return -1;
+                    return a.localeCompare(b);
+                });
+                
+                // Populate custom dropdown with categories
+                sortedCategories.forEach(categoryName => {
+                    // Add category header
+                    const categoryHeader = document.createElement('div');
+                    categoryHeader.className = 'dropdown-category';
+                    categoryHeader.textContent = categoryName;
+                    dropdownOptions.appendChild(categoryHeader);
                     
-                    option.addEventListener('click', function() {
-                        selectDemo(demo, this);
+                    // Add demos in this category
+                    categorizedDemos[categoryName].forEach(demo => {
+                        const option = document.createElement('div');
+                        option.className = 'dropdown-option demo-item';
+                        option.dataset.value = demo.file;
+                        option.innerHTML = `
+                            <div class="demo-name">${demo.name}</div>
+                            <div class="demo-desc">${demo.description}</div>
+                        `;
+                        
+                        option.addEventListener('click', function() {
+                            selectDemo(demo, this);
+                        });
+                        
+                        dropdownOptions.appendChild(option);
                     });
-                    
-                    dropdownOptions.appendChild(option);
                 });
                 
                 // Add dropdown toggle functionality
@@ -347,8 +412,8 @@
             document.getElementById('dropdown-text').innerHTML = `<strong>${demo.name}</strong> - ${demo.description}`;
             document.getElementById('load-button').disabled = false;
             
-            // Update selected state
-            document.querySelectorAll('.dropdown-option').forEach(opt => {
+            // Update selected state - only for demo items, not category headers
+            document.querySelectorAll('.dropdown-option.demo-item').forEach(opt => {
                 opt.classList.remove('selected');
             });
             optionElement.classList.add('selected');

@@ -80,7 +80,12 @@ To build and run this project locally, you'll need the following tools installed
 
 ### Tools & Software 🧰
 
+* [FUSE](https://fuse-emulator.sourceforge.net/) - a ZX Spectrum emulator for various platforms
 * [ZX BASIC](https://zxbasic.readthedocs.io/) - a BASIC cross-compiler for the ZX Spectrum
 * [JSSpeccy](https://github.com/gasman/jsspeccy3) - A JavaScript-based ZX Spectrum emulator that runs in web browsers
+
+### Miscellaneous
+
+* [ZX Art](https://zxart.ee/eng/mainpage/) - ZX Spectrum graphics and art repository
 
 ![](images/zx_spectrum_graphics.gif)

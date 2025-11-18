@@ -1,4 +1,5 @@
 5 REM DESCRIPTION: Perceptron learning a 2-input logic gate
+6 REM CATEGORY: AI & Machine Learning
 10 REM
 20 REM Initialize variables
 30 DIM weights(2) AS FLOAT: REM w0=bias, w1=weight1, w2=weight2

@@ -1,4 +1,5 @@
 5 REM DESC: Classic Tic-Tac-Toe game against the computer
+6 REM CATEGORY: AI & Machine Learning
 10 DIM A(9) AS UBYTE: REM BOARD
 15 DIM M(10) AS UBYTE: REM TO HOLD KNOWLEDGE BASE  
 20 DIM W(24) AS UBYTE: REM WIN/BLOCK DATA
