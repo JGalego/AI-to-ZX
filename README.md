@@ -10,7 +10,7 @@ Programs are written in ZX BASIC, compiled to Z80 machine code, and run in a web
 
 **[📼 Try the demos online →](https://jgalego.github.io/AI-to-ZX/)**
 
-![](images/zx_spectrum_enter.gif)
+![](assets/images/zx_spectrum_enter.gif)
 
 ## Prerequisites
 
@@ -59,7 +59,7 @@ To build and run this project locally, you'll need the following tools installed
 
 5. Open in the browser
 
-    ![](images/ai_to_zx.png)
+    ![](assets/images/ai_to_zx.png)
 
 ## References
 
@@ -80,6 +80,7 @@ To build and run this project locally, you'll need the following tools installed
 
 ### Tools & Software 🧰
 
+* [BAS2TAP](https://github.com/speccyorg/bas2tap) - a simple utility to convert BASIC in an ASCII file to a TAP tape image file
 * [FUSE](https://fuse-emulator.sourceforge.net/) - a ZX Spectrum emulator for various platforms
 * [ZX BASIC](https://zxbasic.readthedocs.io/) - a BASIC cross-compiler for the ZX Spectrum
 * [JSSpeccy](https://github.com/gasman/jsspeccy3) - A JavaScript-based ZX Spectrum emulator that runs in web browsers
@@ -88,4 +89,4 @@ To build and run this project locally, you'll need the following tools installed
 
 * [ZX Art](https://zxart.ee/eng/mainpage/) - ZX Spectrum graphics and art repository
 
-![](images/zx_spectrum_graphics.gif)
+![](assets/images/zx_spectrum_graphics.gif)

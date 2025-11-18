@@ -1,0 +1,386 @@
+5 REM DESC: Matchbox Educable Noughts and Crosses Engine
+6 REM CATEGORY: AI & Machine Learning
+7 REM SOURCE: https://en.wikipedia.org/wiki/Matchbox_Educable_Noughts_and_Crosses_Engine
+8 REM COMMENT: A learning Tic-Tac-Toe engine that improves through reinforcement learning
+
+10 REM *** INITIALIZATION ***
+15 DIM BOARD(9) AS UBYTE: REM Game board (1-9)
+20 DIM GAMESEQ(9) AS UBYTE: REM Sequence of MENACE moves in current game
+25 DIM SEQLEN AS UBYTE: REM Number of MENACE moves made
+30 DIM WINS AS UINTEGER: REM MENACE win count
+35 DIM LOSSES AS UINTEGER: REM MENACE loss count  
+40 DIM DRAWS AS UINTEGER: REM Draw count
+45 DIM GAMES AS UINTEGER: REM Total games played
+
+50 REM *** MENACE KNOWLEDGE BASE ***
+55 REM Each position state has beads representing move preferences
+60 REM We'll use a simplified system with counters for each position
+65 DIM BEADS(304, 9) AS UBYTE: REM 304 possible board states, 9 positions
+70 DIM VALIDMOVES(9) AS UBYTE: REM Valid moves for current state
+75 DIM MOVECOUNT AS UBYTE: REM Number of valid moves
+
+80 REM *** GAME VARIABLES ***
+85 DIM CHOICE AS UBYTE
+86 DIM MOVE AS UBYTE
+87 DIM RESULT AS UBYTE: REM 0=continue, 1=MENACE wins, 2=human wins, 3=draw
+88 DIM STATE AS UINTEGER: REM Current board state hash
+89 DIM TEMP AS UBYTE
+
+90 RANDOMIZE: REM Seed random number generator
+91 GOSUB 2000: REM Initialize MENACE knowledge base
+92 GOSUB 1600: REM Display title screen
+
+93 REM *** MAIN GAME LOOP ***
+94 GOSUB 1050: REM Reset board
+95 SEQLEN = 0
+96 RESULT = 0
+
+97 REM Game loop
+98 IF RESULT = 0 THEN GOSUB 500: REM MENACE move
+99 IF RESULT = 0 THEN GOSUB 800: REM Check game end
+100 IF RESULT = 0 THEN GOSUB 650: REM Human move
+101 IF RESULT = 0 THEN GOSUB 800: REM Check game end
+102 IF RESULT = 0 THEN GOTO 98
+
+103 REM Game finished - update MENACE knowledge
+104 GOSUB 950: REM Update learning
+105 CLS: GOSUB 1250: REM Clear screen and display results
+106 GOSUB 1460: REM Ask to continue, dump, or quit
+107 IF CHOICE = 1 THEN GOTO 94: REM Continue playing
+108 IF CHOICE = 2 THEN GOSUB 1350: GOTO 106: REM Dump matchboxes and return to menu
+109 REM User chose to quit - show statistics and end
+110 GOSUB 1300: REM Show statistics
+111 PRINT: INK 0: PRINT "Thanks for playing with MENACE!"
+112 STOP
+
+300 REM *** UTILITY FUNCTIONS ***
+305 REM Calculate board state hash
+310 STATE = 0
+315 FOR TEMP = 1 TO 9
+320   STATE = STATE * 3
+325   IF BOARD(TEMP) = 79 THEN STATE = STATE + 1: REM 'O' = MENACE
+330   IF BOARD(TEMP) = 88 THEN STATE = STATE + 2: REM 'X' = Human
+335 NEXT TEMP
+340 RETURN
+
+345 REM Check if position is valid
+350 IF MOVE < 1 OR MOVE > 9 THEN RETURN
+355 IF BOARD(MOVE) <> 32 THEN MOVE = 0: RETURN
+360 RETURN
+
+500 REM *** MENACE MOVE SUBROUTINE ***
+505 GOSUB 310: REM Calculate current state
+510 REM Find all valid moves and their bead counts
+515 MOVECOUNT = 0
+520 FOR TEMP = 1 TO 9
+525   IF BOARD(TEMP) = 32 THEN
+530     MOVECOUNT = MOVECOUNT + 1
+535     VALIDMOVES(MOVECOUNT) = TEMP
+540   END IF
+545 NEXT TEMP
+
+550 REM If no valid moves, it's a draw
+555 IF MOVECOUNT = 0 THEN RESULT = 3: RETURN
+
+560 REM Select move based on bead weights
+565 DIM TOTALBEADS AS UINTEGER
+570 TOTALBEADS = 0
+575 FOR TEMP = 1 TO MOVECOUNT
+580   TOTALBEADS = TOTALBEADS + BEADS(STATE MOD 304, VALIDMOVES(TEMP))
+585 NEXT TEMP
+
+590 REM If no beads (new position), choose randomly
+595 IF TOTALBEADS = 0 THEN
+596   MOVE = VALIDMOVES(INT(RND * MOVECOUNT) + 1)
+597   GOTO 625
+598 END IF
+
+599 REM Weighted random selection
+600 DIM RANDVAL AS UINTEGER
+601 RANDVAL = INT(RND * TOTALBEADS) + 1
+602 DIM CUMULATIVE AS UINTEGER
+603 CUMULATIVE = 0
+604 FOR TEMP = 1 TO MOVECOUNT
+605   CUMULATIVE = CUMULATIVE + BEADS(STATE MOD 304, VALIDMOVES(TEMP))
+606   IF RANDVAL <= CUMULATIVE THEN
+607     MOVE = VALIDMOVES(TEMP)
+608     GOTO 625
+609   END IF
+610 NEXT TEMP
+
+615 REM Fallback to first valid move
+620 MOVE = VALIDMOVES(1)
+
+625 REM Make the move
+630 BOARD(MOVE) = 79: REM 'O' for MENACE
+635 SEQLEN = SEQLEN + 1
+640 GAMESEQ(SEQLEN) = STATE MOD 304 * 10 + MOVE: REM Store state+move
+645 CLS: GOSUB 1100: REM Clear screen and display board
+648 RETURN
+
+650 REM *** HUMAN MOVE SUBROUTINE ***
+655 PRINT: INK 4: PRINT "Your turn! Enter position (1-9):"
+660 MOVE = 0
+665 IF INKEY$ = "" THEN GOTO 665
+670 MOVE = VAL(INKEY$)
+675 GOSUB 350: REM Validate move
+680 IF MOVE = 0 THEN INK 1: PRINT "Invalid move! Try again.": GOTO 665
+685 BOARD(MOVE) = 88: REM 'X' for human
+690 CLS: GOSUB 1100: REM Clear screen and display board
+695 RETURN
+
+800 REM *** CHECK GAME END ***
+805 REM Check for wins (rows, columns, diagonals)
+810 DIM WINLINES(8, 3) AS UBYTE
+815 REM Initialize win patterns
+820 RESTORE 9000
+825 FOR TEMP = 1 TO 8
+830   FOR CHOICE = 1 TO 3
+835     READ WINLINES(TEMP, CHOICE)
+840   NEXT CHOICE
+845 NEXT TEMP
+
+850 REM Check each win line
+855 FOR TEMP = 1 TO 8
+860   IF BOARD(WINLINES(TEMP, 1)) <> 32 AND BOARD(WINLINES(TEMP, 1)) = BOARD(WINLINES(TEMP, 2)) AND BOARD(WINLINES(TEMP, 2)) = BOARD(WINLINES(TEMP, 3)) THEN
+865     IF BOARD(WINLINES(TEMP, 1)) = 79 THEN RESULT = 1: RETURN: REM MENACE wins
+870     IF BOARD(WINLINES(TEMP, 1)) = 88 THEN RESULT = 2: RETURN: REM Human wins
+875   END IF
+880 NEXT TEMP
+
+885 REM Check for draw (board full)
+890 FOR TEMP = 1 TO 9
+895   IF BOARD(TEMP) = 32 THEN RETURN: REM Game continues
+900 NEXT TEMP
+905 RESULT = 3: REM Draw
+910 RETURN
+
+950 REM *** UPDATE MENACE LEARNING ***
+951 DIM REWARD AS INTEGER
+952 IF RESULT = 1 THEN REWARD = 3: WINS = WINS + 1: REM MENACE wins
+953 IF RESULT = 2 THEN REWARD = -1: LOSSES = LOSSES + 1: REM MENACE loses
+954 IF RESULT = 3 THEN REWARD = 1: DRAWS = DRAWS + 1: REM Draw
+
+955 REM Update beads for all moves in this game
+956 FOR TEMP = 1 TO SEQLEN
+957   DIM STATEIDX AS UINTEGER
+958   DIM MOVEIDX AS UBYTE
+959   STATEIDX = INT(GAMESEQ(TEMP) / 10)
+960   MOVEIDX = GAMESEQ(TEMP) MOD 10
+961   
+962   REM Add or remove beads based on result
+963   IF REWARD > 0 THEN
+964     BEADS(STATEIDX, MOVEIDX) = BEADS(STATEIDX, MOVEIDX) + REWARD
+965   ELSE
+966     IF BEADS(STATEIDX, MOVEIDX) > 0 THEN BEADS(STATEIDX, MOVEIDX) = BEADS(STATEIDX, MOVEIDX) - 1
+967   END IF
+968   
+969   REM Ensure minimum of 1 bead per position
+970  IF BEADS(STATEIDX, MOVEIDX) = 0 THEN BEADS(STATEIDX, MOVEIDX) = 1
+971 NEXT TEMP
+972 GAMES = GAMES + 1
+973 RETURN
+
+1050 REM *** RESET BOARD ***
+1051 FOR TEMP = 1 TO 9
+1052   BOARD(TEMP) = 32: REM Space character
+1053 NEXT TEMP
+1054 RETURN
+
+1100 REM *** DISPLAY BOARD ***
+1105 PRINT: INK 2: PRINT "  MENACE Learning Tic-Tac-Toe"
+1110 PRINT: PRINT
+1115 INK 0: PRINT "     |     |     "
+1120 GOSUB 1170: REM Print row 1
+1125 INK 0: PRINT "_____|_____|_____"
+1130 INK 0: PRINT "     |     |     "
+1135 GOSUB 1190: REM Print row 2
+1140 INK 0: PRINT "_____|_____|_____"
+1145 INK 0: PRINT "     |     |     "
+1150 GOSUB 1230: REM Print row 3
+1155 INK 0: PRINT "     |     |     "
+1160 RETURN
+
+1170 REM Print board row 1 (positions 1,2,3)
+1171 INK 0: PRINT "  ";
+1172 FOR TEMP = 1 TO 3
+1173   IF BOARD(TEMP) = 79 THEN INK 2: PRINT CHR$(BOARD(TEMP));
+1174   IF BOARD(TEMP) = 88 THEN INK 4: PRINT CHR$(BOARD(TEMP));
+1175   IF BOARD(TEMP) = 32 THEN INK 0: PRINT CHR$(BOARD(TEMP));
+1176   INK 0: IF TEMP < 3 THEN PRINT "  |  "; 
+1177 NEXT TEMP
+1178 PRINT
+1179 RETURN
+
+1190 REM Print board row 2 (positions 4,5,6)
+1191 INK 0: PRINT "  ";
+1192 FOR TEMP = 4 TO 6
+1193   IF BOARD(TEMP) = 79 THEN INK 2: PRINT CHR$(BOARD(TEMP));
+1194   IF BOARD(TEMP) = 88 THEN INK 4: PRINT CHR$(BOARD(TEMP));
+1195   IF BOARD(TEMP) = 32 THEN INK 0: PRINT CHR$(BOARD(TEMP));
+1196   INK 0: IF TEMP < 6 THEN PRINT "  |  "; 
+1197 NEXT TEMP
+1198 PRINT
+1199 RETURN
+
+1230 REM Print board row 3 (positions 7,8,9)
+1231 INK 0: PRINT "  ";
+1232 FOR TEMP = 7 TO 9
+1233   IF BOARD(TEMP) = 79 THEN INK 2: PRINT CHR$(BOARD(TEMP));
+1234   IF BOARD(TEMP) = 88 THEN INK 4: PRINT CHR$(BOARD(TEMP));
+1235   IF BOARD(TEMP) = 32 THEN INK 0: PRINT CHR$(BOARD(TEMP));
+1236   INK 0: IF TEMP < 9 THEN PRINT "  |  "; 
+1237 NEXT TEMP
+1238 PRINT
+1239 RETURN
+
+1250 REM *** DISPLAY GAME RESULT ***
+1255 PRINT: PRINT
+1260 IF RESULT = 1 THEN INK 2: PRINT "MENACE WINS! The machine is learning..."
+1265 IF RESULT = 2 THEN INK 4: PRINT "YOU WIN! MENACE will learn from this."
+1270 IF RESULT = 3 THEN INK 3: PRINT "IT'S A DRAW! A good game."
+1275 RETURN
+
+1300 REM *** SHOW STATISTICS ***
+1305 PRINT: INK 3: PRINT "--- MENACE Statistics ---"
+1310 INK 0: PRINT "Games played: "; INK 0: PRINT GAMES
+1315 INK 0: PRINT "MENACE wins:  "; INK 2: PRINT WINS
+1320 INK 0: PRINT "Human wins:   "; INK 4: PRINT LOSSES  
+1325 INK 0: PRINT "Draws:        "; INK 3: PRINT DRAWS
+1330 IF GAMES > 0 THEN
+1335   INK 0: PRINT "Win rate:     "; INK 5: PRINT INT((WINS * 100) / GAMES); "%"
+1340 END IF
+1345 RETURN
+
+1350 REM *** DUMP MATCHBOX CONTENTS ***
+1355 CLS
+1360 INK 3: PRINT "MENACE Matchbox Contents"
+1365 INK 3: PRINT "========================"
+1370 PRINT
+1375 INK 0: PRINT "Showing bead counts for active states..."
+1380 PRINT
+1385 DIM STATES_SHOWN AS UBYTE
+1390 STATES_SHOWN = 0
+1395 
+1396 FOR STATE = 0 TO 303
+1397   REM Check if this state has any non-default bead counts
+1398   DIM HAS_ACTIVITY AS UBYTE
+1399   HAS_ACTIVITY = 0
+1401   FOR TEMP = 1 TO 9
+1402     REM Show states with learning evidence: very low (1-2) or high (6+) bead counts
+1403     IF BEADS(STATE, TEMP) <= 2 OR BEADS(STATE, TEMP) >= 6 THEN
+1404       HAS_ACTIVITY = 1
+1405       GOTO 1410
+1406     END IF
+1407   NEXT TEMP
+1410   
+1411   REM If state shows learning activity, display it
+1412   IF HAS_ACTIVITY = 1 THEN
+1413     INK 5: PRINT "State "; STATE; ":"
+1414     INK 0: PRINT "Beads: ";
+1415     FOR TEMP = 1 TO 9
+1416       IF BEADS(STATE, TEMP) > 7 THEN INK 2: REM High confidence (green)
+1417       IF BEADS(STATE, TEMP) >= 3 AND BEADS(STATE, TEMP) <= 7 THEN INK 0: REM Normal (black)
+1418       IF BEADS(STATE, TEMP) < 3 THEN INK 1: REM Low confidence (red)
+1419       PRINT BEADS(STATE, TEMP);
+1420       INK 0: IF TEMP < 9 THEN PRINT ",";
+1421     NEXT TEMP
+1422     PRINT
+1423     STATES_SHOWN = STATES_SHOWN + 1
+1424     
+1425     REM Limit display to prevent screen overflow
+1426     IF STATES_SHOWN >= 15 THEN
+1427       PRINT: INK 4: PRINT "[Showing first 15 active states...]"
+1428       GOTO 1435
+1429     END IF
+1430   END IF
+1431 NEXT STATE
+1435 
+1436 IF STATES_SHOWN = 0 THEN
+1437   INK 3: PRINT "No significant learning detected."
+1438   PRINT "Showing first 10 states as sample:"
+1439   PRINT
+1440   FOR STATE = 0 TO 9
+1441     INK 5: PRINT "State "; STATE; ":"
+1442     INK 0: PRINT "Beads: ";
+1443     FOR TEMP = 1 TO 9
+1444       INK 0: PRINT BEADS(STATE, TEMP);
+1445       IF TEMP < 9 THEN PRINT ",";
+1446     NEXT TEMP
+1447     PRINT
+1448   NEXT STATE
+1449 END IF
+1450 
+1451 PRINT: PRINT
+1452 INK 0: PRINT "Legend: ";
+1453 INK 2: PRINT "High ";
+1454 INK 0: PRINT "Normal ";
+1455 INK 1: PRINT "Low confidence"
+1456 PRINT: INK 0: PRINT "Press any key to return..."
+1457 PAUSE 0
+1458 RETURN
+
+1460 REM *** ASK TO CONTINUE, DUMP, OR QUIT ***
+1465 PRINT: PRINT
+1470 INK 5: PRINT "What would you like to do?"
+1475 INK 0: PRINT "1 - Play another game"
+1480 INK 0: PRINT "2 - Dump matchbox contents"
+1485 INK 0: PRINT "3 - Quit and see statistics"
+1490 PRINT: INK 4: PRINT "Enter your choice (1, 2, or 3):"
+1495 CHOICE = 0
+1500 IF INKEY$ = "" THEN GOTO 1500
+1505 CHOICE = VAL(INKEY$)
+1510 IF CHOICE < 1 OR CHOICE > 3 THEN INK 1: PRINT "Invalid choice! Try again.": GOTO 1500
+1515 RETURN
+
+REM Removed conflicted dump subroutine - see line 3000
+
+1600 REM *** TITLE SCREEN ***
+1605 PRINT: PRINT: PRINT
+1610 INK 0: PRINT "################################"
+1615 INK 0: PRINT "#           MENACE             #"
+1620 INK 0: PRINT "#      Matchbox Educable       #"
+1625 INK 0: PRINT "#   Noughts & Crosses Engine   #"
+1630 INK 0: PRINT "#                              #"
+1635 INK 0: PRINT "# AI Tic-Tac-Toe that          #"
+1640 INK 0: PRINT "#       improves through play! #"
+1645 INK 0: PRINT "################################"
+1650 PRINT: PRINT
+1655 INK 0: PRINT "MENACE learns by reinforcement."
+1660 PRINT: PRINT
+1665 INK 4: PRINT "WIN: +3 beads to chosen moves"
+1670 INK 3: PRINT "DRAW: +1 bead to chosen moves" 
+1675 INK 2: PRINT "LOSS: -1 bead from chosen moves"
+1680 PRINT: PRINT
+1685 INK 0: PRINT "You are X, MENACE is O"
+1690 PRINT: INK 1: PRINT "Press any key to start learning!"
+1695 PAUSE 0
+1700 RETURN
+
+2000 REM *** INITIALIZE MENACE KNOWLEDGE BASE ***
+2005 INK 3: PRINT "Initializing knowledge base..."
+2010 REM Initialize all positions with slight random variation
+2015 FOR STATE = 0 TO 303
+2020   FOR MOVE = 1 TO 9
+2025     BEADS(STATE, MOVE) = 3 + INT(RND * 3): REM Start with 3-5 beads per position
+2030   NEXT MOVE
+2035 NEXT STATE
+
+2040 REM Initialize counters
+2045 WINS = 0: LOSSES = 0: DRAWS = 0: GAMES = 0
+2050 RETURN
+
+
+
+9000 REM *** WIN LINE DATA ***
+9005 REM Rows
+9010 DATA 1, 2, 3
+9015 DATA 4, 5, 6  
+9020 DATA 7, 8, 9
+9025 REM Columns
+9030 DATA 1, 4, 7
+9035 DATA 2, 5, 8
+9040 DATA 3, 6, 9
+9045 REM Diagonals
+9050 DATA 1, 5, 9
+9055 DATA 3, 5, 7

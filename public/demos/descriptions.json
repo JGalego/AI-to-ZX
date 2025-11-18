@@ -15,12 +15,12 @@
     "description": "Mandelbrot Explorer by Rob and Kenny",
     "category": "Miscellaneous"
   },
-  "Perceptron.tap": {
-    "description": "Perceptron learning a 2-input logic gate",
+  "MENACE.tap": {
+    "description": "Matchbox Educable Noughts and Crosses Engine",
     "category": "AI & Machine Learning"
   },
-  "TicTacToe.tap": {
-    "description": "Classic Tic-Tac-Toe game against the computer",
+  "Perceptron.tap": {
+    "description": "Train perceptrons on basic 2-input logic gates",
     "category": "AI & Machine Learning"
   }
 }
