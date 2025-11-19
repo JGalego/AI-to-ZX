@@ -3,6 +3,10 @@
     "description": "Colorful display demo showcasing ZX Spectrum's color capabilities",
     "category": "Basic Examples"
   },
+  "ELIZA.tap": {
+    "description": "ELIZA - A classic chatbot simulation",
+    "category": "AI & Machine Learning"
+  },
   "FrereGustav.tap": {
     "description": "Frere Gustav tune, from the ZX Spectrum 48K Manual, Chapter 19",
     "category": "Basic Examples"
@@ -11,13 +15,13 @@
     "description": "A simple hello world program",
     "category": "Basic Examples"
   },
-  "Mandelbrot.tap": {
-    "description": "Mandelbrot Explorer by Rob and Kenny",
-    "category": "Miscellaneous"
-  },
   "MENACE.tap": {
     "description": "Matchbox Educable Noughts and Crosses Engine",
     "category": "AI & Machine Learning"
+  },
+  "Mandelbrot.tap": {
+    "description": "Mandelbrot Explorer by Rob and Kenny",
+    "category": "Miscellaneous"
   },
   "Perceptron.tap": {
     "description": "Train perceptrons on basic 2-input logic gates",
