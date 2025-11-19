@@ -67,7 +67,9 @@ To build and run this project locally, you'll need the following tools installed
 
 * (Brain & Brain, 1984) [Artificial Intelligence on the Spectrum Computer: Make Your Micro Think](https://spectrumcomputing.co.uk/entry/2000035/Book/Artificial_Intelligence_on_the_Spectrum_Computer_Make_Your_Micro_Think)
 * (Hartnell, 1984) [Exploring Artificial Intelligence on your Spectrum+ and Spectrum](https://archive.org/details/timhartnellvz200giantbookofgames/TimHartnell_ExploringArtificialIntelligenceOnYourSpectrum/)
+* (James, 1984) [Artificial Intelligence in Basic](https://www.sciencedirect.com/book/monograph/9780408013734/artificial-intelligence-in-basic)
 * (Jones & Fairhurst, 1984) [Artificial Intelligence: ZX Spectrum](https://spectrumcomputing.co.uk/entry/2000463/Book/Artificial_Intelligence_ZX_Spectrum)
+* (Williams, 1986) [The Intelligent Micro: Artificial Intelligence for Microcomputers](https://zxinfo.dk/details/2000686)
 
 ### Blogs ✍️
 
@@ -87,6 +89,11 @@ To build and run this project locally, you'll need the following tools installed
 
 ### Miscellaneous
 
+* [Load ZX](https://loadzx.com/en/) - a museum dedicated to our first personal computer
+* [Spectrum Computing](https://spectrumcomputing.co.uk/) - the largest archive of ZX Spectrum software, games, and resources
+* [World of Spectrum](https://worldofspectrum.org/) - a comprehensive resource for ZX Spectrum enthusiasts
 * [ZX Art](https://zxart.ee/eng/mainpage/) - ZX Spectrum graphics and art repository
+* [ZXDB](https://github.com/zxdb/ZXDB) - open database with historical information about Sinclair machines
+* [ZXInfo](https://zxinfo.dk/) - a web-app for the ZXDB based search engine
 
 ![](assets/images/zx_spectrum_graphics.gif)
