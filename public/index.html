@@ -286,6 +286,17 @@
             font-weight: bold;
             color: #333;
         }
+
+        .external-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #d9534f; /* red */
+            margin-right: 8px;
+            vertical-align: middle;
+            box-shadow: 0 0 0 2px rgba(217,83,79,0.12);
+        }
         
         .demo-desc {
             color: #666;
@@ -540,7 +551,7 @@
 
                 // Parse demos and organize by category
                 availableDemos = Object.entries(descriptions).map(([filename, demoData]) => {
-                    const name = filename.replace('.tap', '').replace(/[-_]/g, ' ');
+                    const name = filename.replace(/\.tap|\.tzx/, '').replace(/[-_]/g, ' ');
                     
                     // Handle both old format (string) and new format (object)
                     let description, category;
@@ -556,7 +567,8 @@
                         name: name.charAt(0).toUpperCase() + name.slice(1),
                         file: filename,
                         description: description,
-                        category: category
+                        category: category,
+                        is_external: (typeof demoData === 'object' && demoData.is_external) ? true : false
                     };
                 });
                 
@@ -589,8 +601,9 @@
                         const option = document.createElement('div');
                         option.className = 'dropdown-option demo-item';
                         option.dataset.value = demo.file;
+                        const nameHtml = demo.is_external ? `<span class="external-dot" title="External demo"></span>${demo.name}` : demo.name;
                         option.innerHTML = `
-                            <div class="demo-name">${demo.name}</div>
+                            <div class="demo-name">${nameHtml}</div>
                             <div class="demo-desc">${demo.description}</div>
                         `;
                         

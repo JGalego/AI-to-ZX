@@ -15,16 +15,21 @@
     "description": "A simple hello world program",
     "category": "Basic Examples"
   },
-  "MENACE.tap": {
-    "description": "Matchbox Educable Noughts and Crosses Engine",
-    "category": "AI & Machine Learning"
-  },
   "Mandelbrot.tap": {
     "description": "Mandelbrot Explorer by Rob and Kenny",
     "category": "Miscellaneous"
   },
+  "MENACE.tap": {
+    "description": "Matchbox Educable Noughts and Crosses Engine",
+    "category": "AI & Machine Learning"
+  },
   "Perceptron.tap": {
     "description": "Train perceptrons on basic 2-input logic gates",
     "category": "AI & Machine Learning"
+  },
+  "SHRDLU.tzx": {
+    "description": "A miniature imitation of Winograd's SHRDLU by Pete Cooke",
+    "category": "AI & Machine Learning",
+    "is_external": true
   }
 }
