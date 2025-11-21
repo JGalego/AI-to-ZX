@@ -1,0 +1,88 @@
+/* Retro ZX Spectrum theme scoped to body.retro */
+:root{
+    --zx-black:#000;
+    --zx-blue:#0000D7;
+    --zx-red:#D70000;
+    --zx-magenta:#D700D7;
+    --zx-green:#00D700;
+    --zx-cyan:#00D7D7;
+    --zx-yellow:#D7D700;
+    --zx-white:#FFF;
+    --zx-bright-cyan:#00FFFF;
+}
+
+body.retro{
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    background: var(--zx-black) !important;
+    color: var(--zx-white) !important;
+}
+
+/* CRT scanlines overlay (only visible when retro active) */
+body.retro::before{
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(0,0,0,0) 0px,
+        rgba(0,0,0,0) 1px,
+        rgba(0,0,0,0.08) 2px,
+        rgba(0,0,0,0.08) 3px
+    );
+    z-index: 9999;
+}
+
+/* Container styling */
+body.retro .container{
+    max-width:900px;
+    margin:30px auto;
+    background:var(--zx-blue);
+    border:6px solid var(--zx-yellow);
+    padding:22px;
+    box-shadow:none;
+}
+
+body.retro h1{
+    color:var(--zx-yellow);
+    text-shadow:2px 2px var(--zx-red);
+    font-size:1.6rem;
+}
+
+
+
+body.retro .intro-text{color:var(--zx-cyan); font-style:italic}
+
+body.retro .emulator-container{background:var(--zx-black); border:4px solid var(--zx-magenta)}
+
+body.retro .dropdown-header, body.retro .dropdown-options{
+    background:var(--zx-black);
+    color:var(--zx-white);
+    border:3px solid var(--zx-yellow);
+    border-radius:0 !important;
+}
+
+body.retro .dropdown-category{background:var(--zx-magenta); color:var(--zx-yellow)}
+body.retro .dropdown-option{background:var(--zx-black); color:var(--zx-cyan)}
+body.retro .dropdown-option.selected, body.retro .dropdown-option:hover{background:var(--zx-blue); color:var(--zx-yellow)}
+
+body.retro .load-button{background:var(--zx-green); color:var(--zx-black); border:3px solid var(--zx-yellow); font-family:inherit}
+body.retro .load-button:hover{background:var(--zx-yellow); color:var(--zx-red)}
+
+body.retro .instructions{background:var(--zx-black); color:var(--zx-bright-cyan); border-left:6px solid var(--zx-magenta)}
+
+/* subtle responsive tweaks */
+@media (max-width:600px){
+    body.retro .container{margin:8px;padding:10px}
+    body.retro h1{font-size:1.1rem}
+}
+
+/* Toggle switch styles */
+.switch{position:relative; width:42px; height:22px}
+.switch input{opacity:0; width:0; height:0; position:absolute}
+.switch .switch-track{display:block; width:100%; height:100%; background:var(--zx-black); border:3px solid var(--zx-yellow); border-radius:4px; position:relative; cursor:pointer}
+.switch .switch-track::after{content:""; position:absolute; width:14px; height:14px; left:3px; top:3px; background:var(--zx-yellow); border-radius:2px; transition:left 0.12s ease, background 0.12s ease}
+.switch input:checked + .switch-track{background:var(--zx-yellow)}
+.switch input:checked + .switch-track::after{left:22px; background:var(--zx-black)}
+.switch input:focus + .switch-track{outline:2px solid var(--zx-magenta)}
+

@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI to ZX 🧠🌈</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/retro.css">
+
     <style>
         * {
             box-sizing: border-box;
@@ -429,7 +432,7 @@
         }
     </style>
 </head>
-<body>
+<body class="retro">
     <div class="container">
         <h1>AI to ZX 🧠🌈</h1>
         <p class="intro-text">
@@ -447,7 +450,15 @@
                         <!-- Options will be populated by JavaScript -->
                     </div>
                 </div>
-                <button id="load-button" class="load-button" disabled>Load Tape 📼</button>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <button id="load-button" class="load-button" disabled>Load Tape 📼</button>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <div class="switch">
+                            <input id="theme-toggle" type="checkbox" aria-label="Toggle retro theme">
+                            <label for="theme-toggle" class="switch-track" aria-hidden="true"></label>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -741,6 +752,34 @@
             initEmulator();
             setupMobileImprovements();
         });
+
+        // Theme toggle: persisted checkbox input
+        (function() {
+            const TOGGLE_KEY = 'ai2zx_theme_retro';
+            const body = document.body;
+            const checkbox = document.getElementById('theme-toggle');
+            function applyTheme(isRetro) {
+                if (isRetro) body.classList.add('retro'); else body.classList.remove('retro');
+                if (checkbox) checkbox.checked = !!isRetro;
+            }
+
+            // Initialize from localStorage
+            try {
+                const saved = localStorage.getItem(TOGGLE_KEY);
+                const isRetro = saved === '1';
+                applyTheme(isRetro);
+            } catch (e) {
+                // ignore storage errors
+            }
+
+            if (checkbox) {
+                checkbox.addEventListener('change', function() {
+                    const isRetro = checkbox.checked;
+                    try { localStorage.setItem(TOGGLE_KEY, isRetro ? '1' : '0'); } catch (e) {}
+                    applyTheme(isRetro);
+                });
+            }
+        })();
     </script>
 </body>
 </html>
