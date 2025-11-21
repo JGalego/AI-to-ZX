@@ -21,13 +21,39 @@
         }
         
         .container {
-            max-width: 800px;
+            max-width: 1100px;
             margin: 0 auto;
             background-color: white;
             border-radius: 10px;
             padding: 15px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             width: 100%;
+        }
+
+        /* Header: center title with nav absolutely positioned on wide screens */
+        .site-header {
+            position: relative;
+            padding: 8px 0;
+        }
+
+        .site-header .header-center {
+            width: 100%;
+            text-align: center;
+        }
+
+        .site-header .header-center h1 { margin: 0; }
+        /* Strong enforcement: ensure header title is always centered */
+        .site-header .header-center h1 {
+            display: block;
+            width: 100%;
+            text-align: center !important;
+        }
+
+        .site-header .header-nav {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
         }
         
         /* Mobile-first responsive design */
@@ -59,6 +85,9 @@
         }
         
         .emulator-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
             text-align: center;
             margin: 15px 0;
             border: 2px solid #333;
@@ -68,12 +97,13 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         /* Responsive emulator container */
         .emulator-container canvas {
             max-width: 100%;
             height: auto;
             display: block;
+            margin: 0 auto;
         }
         
         @media (min-width: 768px) {
@@ -429,14 +459,40 @@
             .emulator-container.active .emulator-status {
                 display: none;
             }
+            /* Stack header: About link on top, centered title below */
+            .site-header {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 6px;
+            }
+            .site-header .header-nav {
+                position: static;
+                transform: none;
+                order: -1; /* place nav above the title */
+            }
+            .site-header .header-center {
+                width: 100%;
+            }
+            .site-header .about-link {
+                display: inline-block;
+            }
         }
     </style>
 </head>
 <body class="retro">
     <div class="container">
-        <h1>AI to ZX 🧠🌈</h1>
+        <header class="site-header">
+            <div class="header-left"></div>
+            <div class="header-center">
+                <h1>AI to ZX 🧠🌈</h1>
+            </div>
+            <nav class="header-nav" style="font-family: 'Press Start 2P', monospace;">
+                <a href="/about.html" class="about-link" style="color:inherit; text-decoration:none; padding:6px 8px; display:inline-block;">About</a>
+            </nav>
+        </header>
         <p class="intro-text">
-            Bridging the gap between artificial intelligence and retro computing.<br>
+            Bringing AI brains to the 8‑bit Speccy<br>
         </p>
         
         <div class="demo-controls">
@@ -453,9 +509,9 @@
                 <div style="display:flex; gap:10px; align-items:center;">
                     <button id="load-button" class="load-button" disabled>Load Tape 📼</button>
                     <div style="display:flex; align-items:center; gap:8px;">
-                        <div class="switch">
-                            <input id="theme-toggle" type="checkbox" aria-label="Toggle retro theme">
-                            <label for="theme-toggle" class="switch-track" aria-hidden="true"></label>
+                        <div class="switch" title="Toggle Retro theme (hover shows status)">
+                            <input id="theme-toggle" type="checkbox" aria-label="Toggle retro theme" checked>
+                            <label for="theme-toggle" class="switch-track" aria-hidden="true" title="Click to toggle Retro theme"></label>
                         </div>
                     </div>
                 </div>
@@ -515,10 +571,13 @@
             // Handle window resize
             window.addEventListener('resize', debounce(() => {
                 if (emulator) {
+                    // Don't change zoom while the document is in fullscreen mode
+                    if (isDocumentFullscreen()) return;
+
                     // Recalculate zoom if needed
                     const isMobile = window.innerWidth < 600;
                     const newZoom = isMobile ? 1 : 2;
-                    
+
                     // Only update if zoom changed to avoid unnecessary redraws
                     if (emulator.zoom !== newZoom) {
                         emulator.setZoom(newZoom);
@@ -738,6 +797,9 @@
             // Handle orientation change
             window.addEventListener('orientationchange', function() {
                 setTimeout(() => {
+                    // Avoid changing zoom while in fullscreen - that may replace the canvas
+                    if (isDocumentFullscreen()) return;
+
                     if (emulator && emulator.setZoom) {
                         const isMobile = window.innerWidth < 600;
                         const newZoom = isMobile ? 1 : 2;
@@ -745,6 +807,11 @@
                     }
                 }, 100);
             });
+        }
+
+        // Helper: check whether document is currently in fullscreen
+        function isDocumentFullscreen() {
+            return !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
         }
         
         // Initialize when the page loads
@@ -763,11 +830,18 @@
                 if (checkbox) checkbox.checked = !!isRetro;
             }
 
-            // Initialize from localStorage
+            // Initialize from localStorage (accept both '1' and 'true').
             try {
                 const saved = localStorage.getItem(TOGGLE_KEY);
-                const isRetro = saved === '1';
-                applyTheme(isRetro);
+                if (saved !== null) {
+                    const isRetro = (saved === '1' || saved === 'true');
+                    applyTheme(isRetro);
+                } else {
+                    // No stored value: persist the current DOM default so other tabs/pages can sync
+                    const defaultIsRetro = body.classList.contains('retro');
+                    try { localStorage.setItem(TOGGLE_KEY, defaultIsRetro ? '1' : '0'); } catch (e) {}
+                    applyTheme(defaultIsRetro);
+                }
             } catch (e) {
                 // ignore storage errors
             }

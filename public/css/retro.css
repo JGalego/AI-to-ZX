@@ -13,6 +13,10 @@
 
 body.retro{
     font-family: 'Press Start 2P', 'Courier New', monospace;
+    /* Responsive base font-size: small on mobile, larger on desktop */
+    font-size: clamp(12px, 2.2vw, 15px);
+    /* Slightly more vertical breathing space for readability */
+    line-height: 1.6;
     background: var(--zx-black) !important;
     color: var(--zx-white) !important;
 }
@@ -35,7 +39,7 @@ body.retro::before{
 
 /* Container styling */
 body.retro .container{
-    max-width:900px;
+    max-width:1100px;
     margin:30px auto;
     background:var(--zx-blue);
     border:6px solid var(--zx-yellow);
@@ -46,14 +50,16 @@ body.retro .container{
 body.retro h1{
     color:var(--zx-yellow);
     text-shadow:2px 2px var(--zx-red);
-    font-size:1.6rem;
+    /* Use clamp so the title is readable on all devices */
+    font-size: clamp(1.1rem, 3.5vw, 1.6rem);
+    line-height:1.2;
 }
 
 
 
 body.retro .intro-text{color:var(--zx-cyan); font-style:italic}
 
-body.retro .emulator-container{background:var(--zx-black); border:4px solid var(--zx-magenta)}
+body.retro .emulator-container{background:var(--zx-black); border:4px solid var(--zx-magenta); display:flex; justify-content:center; align-items:center}
 
 body.retro .dropdown-header, body.retro .dropdown-options{
     background:var(--zx-black);
@@ -69,12 +75,13 @@ body.retro .dropdown-option.selected, body.retro .dropdown-option:hover{backgrou
 body.retro .load-button{background:var(--zx-green); color:var(--zx-black); border:3px solid var(--zx-yellow); font-family:inherit}
 body.retro .load-button:hover{background:var(--zx-yellow); color:var(--zx-red)}
 
-body.retro .instructions{background:var(--zx-black); color:var(--zx-bright-cyan); border-left:6px solid var(--zx-magenta)}
+body.retro .instructions{background:var(--zx-black); color:var(--zx-bright-cyan); border-left:6px solid var(--zx-magenta); font-size: clamp(11px, 2.0vw, 13px); line-height:1.45}
 
 /* subtle responsive tweaks */
 @media (max-width:600px){
     body.retro .container{margin:8px;padding:10px}
     body.retro h1{font-size:1.1rem}
+    body.retro .instructions { font-size: clamp(10px, 3.6vw, 12px); padding: 8px; }
 }
 
 /* Toggle switch styles */
@@ -85,4 +92,123 @@ body.retro .instructions{background:var(--zx-black); color:var(--zx-bright-cyan)
 .switch input:checked + .switch-track{background:var(--zx-yellow)}
 .switch input:checked + .switch-track::after{left:22px; background:var(--zx-black)}
 .switch input:focus + .switch-track{outline:2px solid var(--zx-magenta)}
+
+
+/* Improve spacing for lists and list items in retro mode to help wrapped lines */
+body.retro ul,
+body.retro ol {
+    padding-left: 1.1em !important;
+    margin-top: 0.6em !important;
+    margin-bottom: 0.9em !important;
+}
+
+body.retro ul li,
+body.retro ol li {
+    line-height: 1.9 !important; /* larger line-height for wrapped lines */
+    margin-bottom: 0.6em !important; /* spacing between list items */
+}
+
+/* If list items contain multiple lines, ensure the second line aligns with the text, not the bullet */
+body.retro ul li::marker,
+body.retro ol li::marker {
+    font-size: 0.9em;
+}
+
+/* Subsection titles (h2/h3) in retro mode: pink/magenta spectrum look */
+body.retro h2,
+body.retro h3 {
+    color: var(--zx-magenta) !important;
+    text-shadow: 1px 1px var(--zx-yellow);
+    font-size: clamp(0.9rem, 2.8vw, 1.1rem) !important;
+    margin-top: 0.9em !important;
+    margin-bottom: 0.6em !important;
+}
+
+/* Align and indent lists: shift slightly to the right and make markers align */
+body.retro ul,
+body.retro ol {
+    padding-left: 2.2em !important; /* push list content right */
+}
+
+body.retro ul li,
+body.retro ol li {
+    text-indent: -0.9em !important; /* pull the bullet into the left gutter */
+    padding-left: 0.9em !important;  /* ensure wrapped lines align with text */
+}
+
+/* Use the native decimal marker but style ::marker for consistent font/color
+   and adjust padding to create a comfortable gutter for numbers. This is
+   simpler and more compatible across browsers than absolute-positioned markers. */
+/* Ordered lists: use a grid so numbers sit in their own column and wrapped
+   lines align consistently. We render the counter via ::before for full
+   control over font, color and spacing. */
+body.retro ol {
+    list-style: none !important;
+    counter-reset: retro-ol;
+    padding-left: 0 !important;
+    margin-top: 0.6em !important;
+    margin-bottom: 0.9em !important;
+}
+
+body.retro ol li {
+    counter-increment: retro-ol;
+    display: grid !important;
+    grid-template-columns: 2.6em 1fr 10.5em !important; /* number | content | commands */
+    column-gap: 0.6em !important; /* space between columns */
+    align-items: start !important;
+    margin-bottom: 0.6em !important;
+}
+
+body.retro ol li::before {
+    content: counter(retro-ol) ".";
+    display: block !important;
+    text-align: right !important;
+    font-family: 'Press Start 2P', monospace !important;
+    color: var(--zx-cyan) !important;
+    font-size: 0.95em !important;
+    padding-right: 0.4em !important;
+}
+
+/* Prevent inline code snippets inside list items from wrapping across lines */
+body.retro ol li code,
+body.retro ol li kbd {
+    white-space: nowrap !important;
+    display: inline-block !important;
+    grid-column: 3 / 4 !important; /* place commands in the right column */
+    justify-self: end !important;
+}
+
+/* Responsive: on small screens, collapse the third column below the content */
+@media (max-width: 640px) {
+    /* On small screens, fall back to native list rendering so the whole
+       list item (number + text + commands) flows and wraps together.
+       Hide the custom ::before counter and enable native markers inside
+       the content. */
+    body.retro ol {
+        list-style: decimal inside !important;
+        padding-left: 0.6em !important;
+    }
+
+    body.retro ol li {
+        display: list-item !important;
+        grid-template-columns: none !important;
+        column-gap: 0 !important;
+        grid-auto-rows: none !important;
+        margin-bottom: 0.6em !important;
+        padding-left: 0 !important;
+    }
+
+    /* Remove the generated counter on small screens */
+    body.retro ol li::before {
+        content: none !important;
+    }
+
+    body.retro ol li code,
+    body.retro ol li kbd {
+        white-space: normal !important; /* allow wrapping */
+        display: inline !important; /* inline with surrounding text */
+        word-break: break-word !important;
+    }
+}
+
 
