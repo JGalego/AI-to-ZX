@@ -69,6 +69,7 @@ To build and run this project locally, you'll need the following tools installed
 * (Hartnell, 1984) [Exploring Artificial Intelligence on your Spectrum+ and Spectrum](https://archive.org/details/timhartnellvz200giantbookofgames/TimHartnell_ExploringArtificialIntelligenceOnYourSpectrum/)
 * (James, 1984) [Artificial Intelligence in Basic](https://www.sciencedirect.com/book/monograph/9780408013734/artificial-intelligence-in-basic)
 * (Jones & Fairhurst, 1984) [Artificial Intelligence: ZX Spectrum](https://spectrumcomputing.co.uk/entry/2000463/Book/Artificial_Intelligence_ZX_Spectrum)
+* (Monteil & Schomberg, 1985) [Programmes d'Inteligence Artificielle en BASIC](https://spectrumcomputing.co.uk/entry/2001181/)
 * (Williams, 1986) [The Intelligent Micro: Artificial Intelligence for Microcomputers](https://zxinfo.dk/details/2000686)
 
 ### Blogs ✍️
