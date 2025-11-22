@@ -30,6 +30,46 @@
             width: 100%;
         }
 
+        /* Responsive emulator styling */
+        .emulator-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 12px 8px;
+            box-sizing: border-box;
+            /* Allow the emulator to take available vertical space without overflowing the viewport */
+            max-height: calc(100vh - 260px);
+            overflow: hidden;
+        }
+
+        /* jsspeccy will create a canvas or image inside this element. Make it adapt while keeping the pixel-art look */
+        #jsspeccy {
+            display: inline-block;
+            touch-action: none; /* avoid accidental page gestures while interacting */
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #jsspeccy canvas,
+        #jsspeccy img {
+            display: block;
+            max-width: 100%;
+            height: auto !important;
+            image-rendering: pixelated; /* keep crisp pixels when scaled */
+            -ms-interpolation-mode: nearest-neighbor;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        /* Allow the dropdown to specify a computed font-size via CSS variable */
+        .custom-dropdown .dropdown-header,
+        .custom-dropdown .dropdown-options,
+        .custom-dropdown .dropdown-option,
+        .custom-dropdown .dropdown-category {
+            font-size: var(--dropdown-font-size, 13px);
+            line-height: 1.4;
+        }
+
         /* Header: center title with nav absolutely positioned on wide screens */
         .site-header {
             position: relative;
@@ -543,23 +583,26 @@
     <script>
         let emulator;
         
+        // ZX Spectrum logical screen size (without borders): 256x192
+        const SPECTRUM_WIDTH = 256;
+        const SPECTRUM_HEIGHT = 192;
+
         // Initialize the emulator
         function initEmulator() {
             const container = document.getElementById('jsspeccy');
-            
-            // Calculate appropriate zoom based on screen size
-            const isMobile = window.innerWidth < 600;
-            const zoom = isMobile ? 1 : 2;
-            
+
+            // Start emulator with a safe default zoom (1). We'll adjust after it's ready.
             emulator = JSSpeccy(container, {
                 machine: 48,             // Start with ZX Spectrum 48K
                 autoStart: false,        // Don't start until we load a program
-                zoom: zoom,              // Responsive zoom level
+                zoom: 1,                 // initial zoom; we'll compute the best fit
                 tapeTrapsEnabled: true,  // Enable fast tape loading
                 autoLoadTapes: true      // Automatically load tapes when opened
             });
-            
+
             emulator.onReady(() => {
+                // Once the emulator has created DOM elements (canvas), calculate a good zoom to fit the container
+                applyBestFitZoom();
                 showStatus('Emulator ready - select a demo to load it');
                 loadDemoList();
                 setupResponsiveEmulator();
@@ -570,20 +613,56 @@
         function setupResponsiveEmulator() {
             // Handle window resize
             window.addEventListener('resize', debounce(() => {
-                if (emulator) {
-                    // Don't change zoom while the document is in fullscreen mode
-                    if (isDocumentFullscreen()) return;
+                if (!emulator) return;
+                // Don't change zoom while the document is in fullscreen mode
+                if (isDocumentFullscreen()) return;
 
-                    // Recalculate zoom if needed
-                    const isMobile = window.innerWidth < 600;
-                    const newZoom = isMobile ? 1 : 2;
+                applyBestFitZoom();
+                adjustDropdownFontSize();
+            }, 150));
+        }
 
-                    // Only update if zoom changed to avoid unnecessary redraws
-                    if (emulator.zoom !== newZoom) {
-                        emulator.setZoom(newZoom);
-                    }
+        // Calculate the largest integer zoom that fits the emulator container while preserving aspect ratio
+        function calculateBestZoom() {
+            const container = document.querySelector('.emulator-container');
+            if (!container) return 1;
+
+            // Use the container's inner width/height (padding reduced by CSS box-sizing)
+            const rect = container.getBoundingClientRect();
+            const availableW = rect.width - 16; // small padding guard
+            const availableH = rect.height - 16;
+
+            // Determine max integer zoom that fits logical spectrum screen (256x192)
+            const zoomByWidth = Math.floor(availableW / SPECTRUM_WIDTH);
+            const zoomByHeight = Math.floor(availableH / SPECTRUM_HEIGHT);
+
+            let zoom = Math.max(1, Math.min(zoomByWidth || 1, zoomByHeight || 1));
+
+            // On very wide screens allow a larger zoom up to 4 for desktop
+            if (window.innerWidth >= 1100) {
+                zoom = Math.min(4, Math.max(zoom, 2));
+            }
+
+            return zoom;
+        }
+
+        function applyBestFitZoom() {
+            if (!emulator || !emulator.setZoom) return;
+            const newZoom = calculateBestZoom();
+            if (emulator.zoom !== newZoom) {
+                emulator.setZoom(newZoom);
+            }
+            // Ensure the created canvas/image respects CSS scaling (helps on mobile)
+            const jEl = document.getElementById('jsspeccy');
+            if (jEl) {
+                // Set explicit width/height on the created canvas to match logical pixels * zoom
+                const canvas = jEl.querySelector('canvas');
+                if (canvas) {
+                    // Some builds of jsspeccy create an internal canvas with its own scaling; preserving pixel-ratio
+                    canvas.style.width = (SPECTRUM_WIDTH * newZoom) + 'px';
+                    canvas.style.height = (SPECTRUM_HEIGHT * newZoom) + 'px';
                 }
-            }, 250));
+            }
         }
         
         // Debounce function to limit resize event frequency
@@ -684,6 +763,8 @@
                         dropdownOptions.appendChild(option);
                     });
                 });
+                // After populating options, adjust dropdown font size for current viewport
+                adjustDropdownFontSize();
                 
                 // Add dropdown toggle functionality
                 dropdownHeader.addEventListener('click', function() {
@@ -692,6 +773,8 @@
                         closeDropdown();
                     } else {
                         openDropdown();
+                        // Adjust font size when opening so items fit
+                        adjustDropdownFontSize();
                     }
                 });
                 
@@ -800,13 +883,41 @@
                     // Avoid changing zoom while in fullscreen - that may replace the canvas
                     if (isDocumentFullscreen()) return;
 
-                    if (emulator && emulator.setZoom) {
-                        const isMobile = window.innerWidth < 600;
-                        const newZoom = isMobile ? 1 : 2;
-                        emulator.setZoom(newZoom);
-                    }
-                }, 100);
+                    applyBestFitZoom();
+                    adjustDropdownFontSize();
+                }, 120);
             });
+        }
+
+        // Adjust dropdown font size so options fit neatly on small screens
+        function adjustDropdownFontSize() {
+            try {
+                const dropdown = document.getElementById('custom-dropdown');
+                const optionsEl = document.getElementById('dropdown-options');
+                if (!dropdown || !optionsEl) return;
+
+                // Measure available width inside the dropdown
+                const rect = dropdown.getBoundingClientRect();
+                const availableW = Math.max(120, rect.width - 24); // keep a reasonable minimum
+
+                // Count number of option elements (exclude category headers when calculating rows)
+                const optionItems = optionsEl.querySelectorAll('.dropdown-option');
+                const itemsCount = Math.max(1, optionItems.length || 1);
+
+                // Decide font-size based on width and count. More items -> slightly smaller text to help fit
+                // Base font size is proportional to width; then scale by item count using a soft inverse factor
+                let baseSize = Math.max(11, Math.min(16, Math.floor(availableW / 20)));
+                const countFactor = Math.max(0.75, Math.min(1, 1 - (Math.log(itemsCount + 1) / 10)));
+                let computed = Math.round(baseSize * countFactor);
+
+                // Clamp to a sensible range for readability
+                computed = Math.max(10, Math.min(16, computed));
+
+                // Apply via CSS variable on the dropdown root
+                dropdown.style.setProperty('--dropdown-font-size', computed + 'px');
+            } catch (e) {
+                // fail silently
+            }
         }
 
         // Helper: check whether document is currently in fullscreen
@@ -818,6 +929,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             initEmulator();
             setupMobileImprovements();
+            // initial dropdown sizing
+            adjustDropdownFontSize();
         });
 
         // Theme toggle: persisted checkbox input

@@ -1,4 +1,4 @@
-1 REM DESCRIPTION: A miniature imitation of Winograd's SHRDLU by Pete Cooke
+1 REM DESCRIPTION: A smaller version of Winograd's SHRDLU by Pete Cooke
 2 REM CATEGORY: AI & Machine Learning
 
 3 POKE 23658,0

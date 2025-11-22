@@ -4,31 +4,31 @@
     "category": "Basic Examples"
   },
   "ELIZA.tap": {
-    "description": "ELIZA - A classic chatbot simulation",
+    "description": "Early chatbot program by Joseph Weizenbaum",
     "category": "AI & Machine Learning"
   },
   "FrereGustav.tap": {
-    "description": "Frere Gustav tune, from the ZX Spectrum 48K Manual, Chapter 19",
+    "description": "Frere Gustav tune from the ZX Spectrum 48K Manual",
     "category": "Basic Examples"
   },
   "HelloWorld.tap": {
     "description": "A simple hello world program",
     "category": "Basic Examples"
   },
-  "Mandelbrot.tap": {
-    "description": "Mandelbrot Explorer by Rob and Kenny",
-    "category": "Miscellaneous"
-  },
   "MENACE.tap": {
     "description": "Matchbox Educable Noughts and Crosses Engine",
     "category": "AI & Machine Learning"
   },
+  "Mandelbrot.tap": {
+    "description": "Mandelbrot Explorer by Rob and Kenny",
+    "category": "Miscellaneous"
+  },
   "Perceptron.tap": {
-    "description": "Train perceptrons on basic 2-input logic gates",
+    "description": "Train small neural networks to learn logic gates",
     "category": "AI & Machine Learning"
   },
   "SHRDLU.tzx": {
-    "description": "A miniature imitation of Winograd's SHRDLU by Pete Cooke",
+    "description": "A smaller version of Winograd's SHRDLU by Pete Cooke",
     "category": "AI & Machine Learning",
     "is_external": true
   }

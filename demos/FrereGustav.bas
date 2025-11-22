@@ -1,4 +1,4 @@
-5 REM DESCRIPTION: Frere Gustav tune, from the ZX Spectrum 48K Manual, Chapter 19
+5 REM DESCRIPTION: Frere Gustav tune from the ZX Spectrum 48K Manual
 6 REM CATEGORY: Basic Examples
 7 REM SOURCE: https://zxbasic.readthedocs.io/en/latest/examples/freregustav.bas/
 

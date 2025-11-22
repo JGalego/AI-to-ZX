@@ -1,4 +1,4 @@
-5 REM DESCRIPTION: ELIZA - A classic chatbot simulation
+5 REM DESCRIPTION: Early chatbot program by Joseph Weizenbaum
 6 REM CATEGORY: AI & Machine Learning
 7 REM SOURCE: https://www.atariarchives.org/bcc3/showpage.php?page=251
 8 REM COMMENT: Adapted by JGalego from Jeff North's ELIZA

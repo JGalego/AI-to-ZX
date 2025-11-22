@@ -1,4 +1,4 @@
-5 REM DESCRIPTION: Train perceptrons on basic 2-input logic gates
+5 REM DESCRIPTION: Train small neural networks to learn logic gates
 6 REM CATEGORY: AI & Machine Learning
 7 REM SOURCE: https://blog.lessaworld.com/2025/03/09/running-a-perceptron-on-an-8-bit-computer/
 
