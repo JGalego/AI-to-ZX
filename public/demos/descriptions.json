@@ -1,6 +1,6 @@
 {
   "ColorDemo.tap": {
-    "description": "Colorful display demo showcasing ZX Spectrum's color capabilities",
+    "description": "A colorful display of Speccy's palette",
     "category": "Basic Examples"
   },
   "ELIZA.tap": {
@@ -26,6 +26,11 @@
   "Perceptron.tap": {
     "description": "Train small neural networks to learn logic gates",
     "category": "AI & Machine Learning"
+  },
+  "4INAROW.tap": {
+    "description": "4 in a Row program with AI that plays against you",
+    "category": "Games",
+    "is_external": true
   },
   "SHRDLU.tzx": {
     "description": "A smaller version of Winograd's SHRDLU by Pete Cooke",

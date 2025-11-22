@@ -1,8 +1,6 @@
 # Ignore jsspeccy library files
 public/libs/jsspeccy/
 
-# Ignore all TZX files in public/demos folder, BUT not demos/external
+# Ignore all TAP/TZX files in public/demos folder, BUT not demos/external
 public/demos/*.tzx
-
-# Ignore all TAP files
-*.tap
+public/demos/*.tap

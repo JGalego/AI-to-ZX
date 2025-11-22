@@ -1,4 +1,4 @@
-5 REM DESCRIPTION: Colorful display demo showcasing ZX Spectrum's color capabilities
+5 REM DESCRIPTION: A colorful display of Speccy's palette
 6 REM CATEGORY: Basic Examples
 
 10 FOR I=0 TO 7
