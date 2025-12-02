@@ -1,51 +1,22 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self';">
+  <meta name="description" content="About AI to ZX - Learn about this project bridging retro computing and modern AI concepts">
+  <meta property="og:title" content="About - AI to ZX">
+  <meta property="og:description" content="AI demonstrations on ZX Spectrum - classic algorithms on retro hardware">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <title>About — AI to ZX</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/retro.css">
-  <style>
-    /* minimal page-specific overrides */
-    body{font-family: Arial, sans-serif; padding:15px; background:#111;color:#eee}
-    .content{max-width:1100px; margin:0 auto; background:#1a1a1a; padding:18px; border-radius:8px; color:#eee; border: 1px solid #333;}
-    /* Avoid awkward wrapping for long links */
-    .content a { word-break: break-word; color: #4da6ff; text-decoration: none; }
-    .content a:hover { text-decoration: underline; }
-    /* When retro theme is active, let the retro stylesheet control colors */
-    body.retro .content{background:transparent;color:var(--zx-paper, #eee);border-radius:0;padding:14px;border:none;}
-    .content h1{font-family:'Press Start 2P',monospace; color: #fff;}
-    .content h2, .content h3 { color: #ccc; }
-    .back{margin-bottom:12px; display:inline-block; color: #4da6ff; text-decoration: none;}
-    .back:hover{text-decoration: underline;}
-    pre{white-space:pre-wrap}
-    /* Improve code readability */
-    code, kbd {
-      display: inline-block;
-      vertical-align: middle;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace;
-      font-size: 0.92rem; /* closer to body text */
-      line-height: 1.4;
-      background: rgba(255,255,255,0.08);
-      padding: 1px 6px;
-      border-radius: 4px;
-      color: #e0e0e0;
-    }
-    pre {
-      display:block;
-      padding: 12px;
-      background: rgba(255,255,255,0.05);
-      overflow-x: auto;
-      font-size: 0.95rem;
-      line-height: 1.45;
-      margin: 0.8em 0;
-    }
-  </style>
+  <link rel="stylesheet" href="css/about.css">
   </head>
   <body class="retro">
   <div class="content">
-    <div style="margin-bottom:8px;">
+    <div>
       <a class="back" href="/"><< Back</a>
     </div>
     <h1>AI to ZX 🧠🌈</h1>
@@ -53,6 +24,10 @@
     <p><strong>AI to ZX</strong> is a collection of artificial intelligence (AI) and computational demonstrations running on the legendary ZX Spectrum computer.</p>
     <p>This project bridges the gap between retro computing nostalgia and modern AI concepts by implementing classic algorithms within 1980s hardware constraints.</p>
     <p>Programs are written in ZX BASIC, compiled to Z80 machine code, and run in a web-based emulator (JSSpeccy).</p>
+
+    <div class="image-container">
+      <img src="assets/images/zx_spectrum_enter.gif" alt="Animated ZX Spectrum keyboard with 'Enter' key highlighted - welcoming users to AI to ZX">
+    </div>
 
     <h2>Prerequisites</h2>
     <ul>
@@ -108,11 +83,13 @@
       <li><a href="https://zxinfo.dk/">ZXInfo</a> - web app for ZXDB search</li>
     </ul>
 
-    <div style="text-align: center; margin: 20px 0;">
-      <img src="assets/images/zx_spectrum_enter.gif" alt="Enter AI to ZX" style="max-width: 100%; height: auto;">
+    <div class="image-container">
+      <img src="assets/images/zx_spectrum_graphics.gif" alt="Animated ZX Spectrum graphics showcasing colorful pixel art and patterns">
     </div>
 
-    <p style="text-align: center; margin-top:15px; padding-top:10px; border-top: 1px solid #333; color:#999;font-size:0.9em">Made with ❤️ by <a href="https://github.com/JGalego/AI-to-ZX" target="_blank" style="color:#4da6ff">JGalego</a></p>
+    <div class="footer">
+      Made with ❤️ by <a href="https://github.com/JGalego/AI-to-ZX" target="_blank">JGalego</a>
+    </div>
   </div>
 
 </body>

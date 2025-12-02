@@ -1,5 +1,6 @@
 /* Retro ZX Spectrum theme scoped to body.retro */
 :root{
+    /* ZX Spectrum color palette */
     --zx-black:#000;
     --zx-blue:#0000D7;
     --zx-red:#D70000;
@@ -9,6 +10,16 @@
     --zx-yellow:#D7D700;
     --zx-white:#FFF;
     --zx-bright-cyan:#00FFFF;
+    
+    /* Responsive breakpoints */
+    --breakpoint-mobile: 480px;
+    --breakpoint-small: 640px;
+    --breakpoint-medium: 768px;
+    
+    /* Common spacing values */
+    --spacing-small: 0.6em;
+    --spacing-medium: 0.9em;
+    --spacing-large: 1.2em;
 }
 
 body.retro{
@@ -17,8 +28,8 @@ body.retro{
     font-size: clamp(12px, 2.2vw, 15px);
     /* Slightly more vertical breathing space for readability */
     line-height: 1.6;
-    background: var(--zx-black) !important;
-    color: var(--zx-white) !important;
+    background: var(--zx-black);
+    color: var(--zx-white);
 }
 
 /* CRT scanlines overlay (only visible when retro active) */
@@ -40,7 +51,10 @@ body.retro::before{
 /* Container styling */
 body.retro .container{
     max-width:100%;
-    margin:0;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 0;
+    margin-bottom: 0;
     background:var(--zx-black);
     border:none;
     padding:22px;
@@ -66,7 +80,7 @@ body.retro .dropdown-header, body.retro .dropdown-options{
     background:var(--zx-blue);
     color:var(--zx-white);
     border:3px solid var(--zx-yellow);
-    border-radius:0 !important;
+    border-radius:0;
 }
 
 body.retro .dropdown-category{background:var(--zx-magenta); color:var(--zx-yellow)}
@@ -80,7 +94,13 @@ body.retro .instructions{background:var(--zx-blue); color:var(--zx-white); borde
 
 /* subtle responsive tweaks */
 @media (max-width:600px){
-    body.retro .container{margin:0;padding:10px}
+    body.retro .container{
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 0;
+        margin-bottom: 0;
+        padding:10px;
+    }
     body.retro h1{font-size:1.1rem}
     body.retro .instructions { font-size: clamp(10px, 3.6vw, 12px); padding: 8px; }
 }
@@ -98,15 +118,15 @@ body.retro .instructions{background:var(--zx-blue); color:var(--zx-white); borde
 /* Improve spacing for lists and list items in retro mode to help wrapped lines */
 body.retro ul,
 body.retro ol {
-    padding-left: 1.1em !important;
-    margin-top: 0.6em !important;
-    margin-bottom: 0.9em !important;
+    padding-left: 1.1em;
+    margin-top: var(--spacing-small);
+    margin-bottom: var(--spacing-medium);
 }
 
 body.retro ul li,
 body.retro ol li {
-    line-height: 1.9 !important; /* larger line-height for wrapped lines */
-    margin-bottom: 0.6em !important; /* spacing between list items */
+    line-height: 1.9;
+    margin-bottom: var(--spacing-small);
 }
 
 /* If list items contain multiple lines, ensure the second line aligns with the text, not the bullet */
@@ -118,23 +138,23 @@ body.retro ol li::marker {
 /* Subsection titles (h2/h3) in retro mode: pink/magenta spectrum look */
 body.retro h2,
 body.retro h3 {
-    color: var(--zx-yellow) !important;
+    color: var(--zx-yellow);
     text-shadow: 1px 1px var(--zx-red);
-    font-size: clamp(0.9rem, 2.8vw, 1.1rem) !important;
-    margin-top: 0.9em !important;
-    margin-bottom: 0.6em !important;
+    font-size: clamp(0.9rem, 2.8vw, 1.1rem);
+    margin-top: var(--spacing-medium);
+    margin-bottom: var(--spacing-small);
 }
 
 /* Align and indent lists: shift slightly to the right and make markers align */
 body.retro ul,
 body.retro ol {
-    padding-left: 2.2em !important; /* push list content right */
+    padding-left: 2.2em;
 }
 
 body.retro ul li,
 body.retro ol li {
-    text-indent: -0.9em !important; /* pull the bullet into the left gutter */
-    padding-left: 0.9em !important;  /* ensure wrapped lines align with text */
+    text-indent: -0.9em;
+    padding-left: 0.9em;
 }
 
 /* Use the native decimal marker but style ::marker for consistent font/color
@@ -144,39 +164,39 @@ body.retro ol li {
    lines align consistently. We render the counter via ::before for full
    control over font, color and spacing. */
 body.retro ol {
-    list-style: none !important;
+    list-style: none;
     counter-reset: retro-ol;
-    padding-left: 0 !important;
-    margin-top: 0.6em !important;
-    margin-bottom: 0.9em !important;
+    padding-left: 0;
+    margin-top: var(--spacing-small);
+    margin-bottom: var(--spacing-medium);
 }
 
 body.retro ol li {
     counter-increment: retro-ol;
-    display: grid !important;
-    grid-template-columns: 2.6em 1fr 10.5em !important; /* number | content | commands */
-    column-gap: 0.6em !important; /* space between columns */
-    align-items: start !important;
-    margin-bottom: 0.6em !important;
+    display: grid;
+    grid-template-columns: 2.6em 1fr 10.5em;
+    column-gap: var(--spacing-small);
+    align-items: start;
+    margin-bottom: var(--spacing-small);
 }
 
 body.retro ol li::before {
     content: counter(retro-ol) ".";
-    display: block !important;
-    text-align: right !important;
-    font-family: 'Press Start 2P', monospace !important;
-    color: var(--zx-cyan) !important;
-    font-size: 0.95em !important;
-    padding-right: 0.4em !important;
+    display: block;
+    text-align: right;
+    font-family: 'Press Start 2P', monospace;
+    color: var(--zx-cyan);
+    font-size: 0.95em;
+    padding-right: 0.4em;
 }
 
 /* Prevent inline code snippets inside list items from wrapping across lines */
 body.retro ol li code,
 body.retro ol li kbd {
-    white-space: nowrap !important;
-    display: inline-block !important;
-    grid-column: 3 / 4 !important; /* place commands in the right column */
-    justify-self: end !important;
+    white-space: nowrap;
+    display: inline-block;
+    grid-column: 3 / 4;
+    justify-self: end;
 }
 
 /* Responsive: on small screens, collapse the third column below the content */
@@ -186,29 +206,29 @@ body.retro ol li kbd {
        Hide the custom ::before counter and enable native markers inside
        the content. */
     body.retro ol {
-        list-style: decimal inside !important;
-        padding-left: 0.6em !important;
+        list-style: decimal inside;
+        padding-left: var(--spacing-small);
     }
 
     body.retro ol li {
-        display: list-item !important;
-        grid-template-columns: none !important;
-        column-gap: 0 !important;
-        grid-auto-rows: none !important;
-        margin-bottom: 0.6em !important;
-        padding-left: 0 !important;
+        display: list-item;
+        grid-template-columns: none;
+        column-gap: 0;
+        grid-auto-rows: none;
+        margin-bottom: var(--spacing-small);
+        padding-left: 0;
     }
 
     /* Remove the generated counter on small screens */
     body.retro ol li::before {
-        content: none !important;
+        content: none;
     }
 
     body.retro ol li code,
     body.retro ol li kbd {
-        white-space: normal !important; /* allow wrapping */
-        display: inline !important; /* inline with surrounding text */
-        word-break: break-word !important;
+        white-space: normal;
+        display: inline;
+        word-break: break-word;
     }
 }
 

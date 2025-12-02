@@ -3,11 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self';">
+    <meta name="description" content="AI demonstrations on ZX Spectrum - classic algorithms and machine learning programs running on retro 8-bit hardware">
+    <meta name="keywords" content="ZX Spectrum, AI, artificial intelligence, retro computing, machine learning, ELIZA, MENACE, Perceptron">
+    <meta property="og:title" content="AI to ZX 🧠🌈">
+    <meta property="og:description" content="Bringing AI brains to the 8-bit Speccy">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="/assets/images/zx_spectrum_enter.gif">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <title>AI to ZX 🧠🌈</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/retro.css">
 
     <style>
+        :root {
+            /* Breakpoint variables */
+            --breakpoint-mobile: 480px;
+            --breakpoint-small: 600px;
+            --breakpoint-medium: 768px;
+            --breakpoint-large: 1100px;
+        }
+        
         * {
             box-sizing: border-box;
         }
@@ -22,9 +38,9 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            width: min(95vw, 1100px);
-            margin-left: auto !important;
-            margin-right: auto !important;
+            width: min(95vw, var(--breakpoint-large));
+            margin-left: auto;
+            margin-right: auto;
             padding: 15px;
         }
         
@@ -49,24 +65,24 @@
 
         /* jsspeccy will create a canvas or image inside this element. Make it adapt while keeping the pixel-art look */
         #jsspeccy {
-            display: flex !important;
-            width: 100% !important;
-            height: 100% !important;
-            justify-content: center !important;
-            align-items: center !important;
+            display: flex;
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
             touch-action: none; /* avoid accidental page gestures while interacting */
             -webkit-tap-highlight-color: transparent;
         }
 
         #jsspeccy canvas,
         #jsspeccy img {
-            display: block !important;
-            width: 100% !important;
-            height: 100% !important;
-            max-width: none !important;
-            max-height: none !important;
-            object-fit: contain !important;
-            margin: auto !important;
+            display: block;
+            width: 100%;
+            height: 100%;
+            max-width: none;
+            max-height: none;
+            object-fit: contain;
+            margin: auto;
             image-rendering: pixelated; /* keep crisp pixels when scaled */
             -ms-interpolation-mode: nearest-neighbor;
             user-select: none;
@@ -98,7 +114,7 @@
         .site-header .header-center h1 {
             display: block;
             width: 100%;
-            text-align: center !important;
+            text-align: center;
         }
 
         .site-header .header-nav {
@@ -495,7 +511,6 @@
 <body class="retro">
     <div class="container">
         <header class="site-header">
-            <div class="header-left"></div>
             <div class="header-center">
                 <h1>AI to ZX 🧠🌈</h1>
             </div>
@@ -510,11 +525,11 @@
         <div class="demo-controls">
             <div class="demo-selector">
                 <div id="custom-dropdown" class="custom-dropdown">
-                    <div id="dropdown-header" class="dropdown-header">
+                    <div id="dropdown-header" class="dropdown-header" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Select a demo program">
                         <span id="dropdown-text">Choose a demo...</span>
-                        <span class="dropdown-arrow">▼</span>
+                        <span class="dropdown-arrow" aria-hidden="true">▼</span>
                     </div>
-                    <div id="dropdown-options" class="dropdown-options">
+                    <div id="dropdown-options" class="dropdown-options" role="listbox" aria-label="Available demos">
                         <!-- Options will be populated by JavaScript -->
                     </div>
                 </div>
@@ -547,6 +562,30 @@
 
     <script src="libs/jsspeccy/jsspeccy.js"></script>
     <script>
+        'use strict';
+        
+        // Configuration constants
+        const CONFIG = {
+            SPECTRUM_WIDTH: 256,
+            SPECTRUM_HEIGHT: 192,
+            MIN_TOUCH_TARGET: 44,
+            DEMO_PATH: 'demos/',
+            DESCRIPTIONS_FILE: 'demos/descriptions.json',
+            DEFAULT_ZOOM: 1,
+            MAX_ZOOM: 4,
+            DEBOUNCE_DELAY: 150,
+            ORIENTATION_CHANGE_DELAY: 120,
+            STATUS_DURATION: 3000
+        };
+        
+        // Application state encapsulation
+        const AppState = {
+            emulator: null,
+            availableDemos: [],
+            selectedDemo: null,
+            isInitialized: false
+        };
+        
         let emulator;
         
         // ZX Spectrum logical screen size (without borders): 256x192
@@ -558,15 +597,17 @@
             const container = document.getElementById('jsspeccy');
 
             // Start emulator with a safe default zoom (1). We'll adjust after it's ready.
-            emulator = JSSpeccy(container, {
+            AppState.emulator = JSSpeccy(container, {
                 machine: 48,             // Start with ZX Spectrum 48K
                 autoStart: false,        // Don't start until we load a program
-                zoom: 1,                 // initial zoom; we'll compute the best fit
+                zoom: CONFIG.DEFAULT_ZOOM, // initial zoom; we'll compute the best fit
                 tapeTrapsEnabled: true,  // Enable fast tape loading
                 autoLoadTapes: true      // Automatically load tapes when opened
             });
+            
+            emulator = AppState.emulator;
 
-            emulator.onReady(() => {
+            AppState.emulator.onReady(() => {
                 // Once the emulator has created DOM elements (canvas), calculate a good zoom to fit the container
                 applyBestFitZoom();
                 showStatus('Emulator ready - select a demo to load it');
@@ -579,19 +620,19 @@
         function setupResponsiveEmulator() {
             // Handle window resize
             window.addEventListener('resize', debounce(() => {
-                if (!emulator) return;
+                if (!AppState.emulator) return;
                 // Don't change zoom while the document is in fullscreen mode
                 if (isDocumentFullscreen()) return;
 
                 applyBestFitZoom();
                 adjustDropdownFontSize();
-            }, 150));
+            }, CONFIG.DEBOUNCE_DELAY));
         }
 
         // Calculate the largest integer zoom that fits the emulator container while preserving aspect ratio
         function calculateBestZoom() {
             const container = document.querySelector('.emulator-container');
-            if (!container) return 1;
+            if (!container) return CONFIG.DEFAULT_ZOOM;
 
             // Use the container's inner width/height (padding reduced by CSS box-sizing)
             const rect = container.getBoundingClientRect();
@@ -599,24 +640,24 @@
             const availableH = rect.height - 16;
 
             // Determine max integer zoom that fits logical spectrum screen (256x192)
-            const zoomByWidth = Math.floor(availableW / SPECTRUM_WIDTH);
-            const zoomByHeight = Math.floor(availableH / SPECTRUM_HEIGHT);
+            const zoomByWidth = Math.floor(availableW / CONFIG.SPECTRUM_WIDTH);
+            const zoomByHeight = Math.floor(availableH / CONFIG.SPECTRUM_HEIGHT);
 
             let zoom = Math.max(1, Math.min(zoomByWidth || 1, zoomByHeight || 1));
 
             // On very wide screens allow a larger zoom up to 4 for desktop
             if (window.innerWidth >= 1100) {
-                zoom = Math.min(4, Math.max(zoom, 2));
+                zoom = Math.min(CONFIG.MAX_ZOOM, Math.max(zoom, 2));
             }
 
             return zoom;
         }
 
         function applyBestFitZoom() {
-            if (!emulator || !emulator.setZoom) return;
+            if (!AppState.emulator || !AppState.emulator.setZoom) return;
             const newZoom = calculateBestZoom();
-            if (emulator.zoom !== newZoom) {
-                emulator.setZoom(newZoom);
+            if (AppState.emulator.zoom !== newZoom) {
+                AppState.emulator.setZoom(newZoom);
             }
             // Force canvas to fill the container centered
             const jEl = document.getElementById('jsspeccy');
@@ -644,7 +685,7 @@
             };
         }
         
-        // Store loaded demos for later use
+        // Store loaded demos for later use (deprecated - use AppState instead)
         let availableDemos = [];
         let selectedDemo = null;
         
@@ -656,16 +697,19 @@
                 const dropdownOptions = document.getElementById('dropdown-options');
                 const loadButton = document.getElementById('load-button');
                 
+                // Show loading state
+                dropdownText.textContent = 'Loading demos...';
+                
                 // Load descriptions from JSON file
-                const descResponse = await fetch('demos/descriptions.json');
+                const descResponse = await fetch(CONFIG.DESCRIPTIONS_FILE);
                 if (!descResponse.ok) {
-                    throw new Error('Could not load descriptions.json');
+                    throw new Error(`Could not load ${CONFIG.DESCRIPTIONS_FILE}: ${descResponse.status}`);
                 }
                 
                 const descriptions = await descResponse.json();
 
                 // Parse demos and organize by category
-                availableDemos = Object.entries(descriptions).map(([filename, demoData]) => {
+                AppState.availableDemos = Object.entries(descriptions).map(([filename, demoData]) => {
                     const name = filename.replace(/\.tap|\.tzx/, '').replace(/[-_]/g, ' ');
                     
                     // Handle both old format (string) and new format (object)
@@ -689,7 +733,7 @@
                 
                 // Group demos by category
                 const categorizedDemos = {};
-                availableDemos.forEach(demo => {
+                AppState.availableDemos.forEach(demo => {
                     if (!categorizedDemos[demo.category]) {
                         categorizedDemos[demo.category] = [];
                     }
@@ -752,27 +796,50 @@
                 });
                 
                 // Load button functionality
-                loadButton.addEventListener('click', function() {
-                    if (selectedDemo) {
-                        loadDemo(selectedDemo.file, selectedDemo.name);
+                loadButton.addEventListener('click', async function() {
+                    if (AppState.selectedDemo) {
+                        // Show loading state
+                        const originalText = this.innerHTML;
+                        this.innerHTML = 'Loading... ⏳';
+                        this.disabled = true;
+                        
+                        try {
+                            await loadDemo(AppState.selectedDemo.file, AppState.selectedDemo.name);
+                        } finally {
+                            // Restore button after a brief delay
+                            setTimeout(() => {
+                                this.innerHTML = originalText;
+                                this.disabled = false;
+                            }, 1000);
+                        }
                     }
                 });
                 
-                if (availableDemos.length === 0) {
+                if (AppState.availableDemos.length === 0) {
                     dropdownText.textContent = 'No demos available!';
                 }
                 
             } catch (error) {
                 console.error('Error loading demo list:', error);
-                document.getElementById('dropdown-text').textContent = 'Error loading demos';
+                const dropdownText = document.getElementById('dropdown-text');
+                if (dropdownText) {
+                    dropdownText.textContent = 'Error loading demos';
+                }
+                showStatus(`Failed to load demo list: ${error.message}`, 5000);
             }
         }
         
         // Helper functions for custom dropdown
         function selectDemo(demo, optionElement) {
-            selectedDemo = demo;
-            document.getElementById('dropdown-text').innerHTML = `<strong>${demo.name}</strong> - ${demo.description}`;
+            AppState.selectedDemo = demo;
+            const dropdownText = document.getElementById('dropdown-text');
+            const dropdownHeader = document.getElementById('dropdown-header');
+            
+            dropdownText.innerHTML = `<strong>${demo.name}</strong> - ${demo.description}`;
             document.getElementById('load-button').disabled = false;
+            
+            // Update ARIA label
+            dropdownHeader.setAttribute('aria-label', `Selected: ${demo.name}`);
             
             // Update selected state - only for demo items, not category headers
             document.querySelectorAll('.dropdown-option.demo-item').forEach(opt => {
@@ -784,17 +851,25 @@
         }
         
         function openDropdown() {
-            document.getElementById('dropdown-header').classList.add('active');
-            document.getElementById('dropdown-options').classList.add('show');
+            const header = document.getElementById('dropdown-header');
+            const options = document.getElementById('dropdown-options');
+            
+            header.classList.add('active');
+            header.setAttribute('aria-expanded', 'true');
+            options.classList.add('show');
         }
         
         function closeDropdown() {
-            document.getElementById('dropdown-header').classList.remove('active');
-            document.getElementById('dropdown-options').classList.remove('show');
+            const header = document.getElementById('dropdown-header');
+            const options = document.getElementById('dropdown-options');
+            
+            header.classList.remove('active');
+            header.setAttribute('aria-expanded', 'false');
+            options.classList.remove('show');
         }
         
         // Show status message in emulator overlay
-        function showStatus(message, duration = 3000) {
+        function showStatus(message, duration = CONFIG.STATUS_DURATION) {
             const statusEl = document.getElementById('emulator-status');
             statusEl.innerHTML = message;
             statusEl.style.opacity = '1';
@@ -811,19 +886,23 @@
             try {
                 showStatus(`Loading ${name}...`, 0);
                 
-                const url = `demos/${filename}`;
-                await emulator.openUrl(url);
+                const url = `${CONFIG.DEMO_PATH}${filename}`;
+                await AppState.emulator.openUrl(url);
                 
                 showStatus(`<b>${name}</b> loaded and running!`);
                 
             } catch (error) {
                 console.error('Error loading demo:', error);
-                showStatus(`Error loading ${name}: ${error}`, 5000);
+                showStatus(`Error loading ${name}: ${error.message}`, 5000);
             }
         }
         
         // Improve mobile experience
         function setupMobileImprovements() {
+            // Prevent duplicate initialization
+            if (AppState.isInitialized) return;
+            AppState.isInitialized = true;
+            
             // Prevent double-tap zoom on buttons
             const buttons = document.querySelectorAll('button, .dropdown-header, .dropdown-option');
             buttons.forEach(button => {
@@ -851,7 +930,7 @@
 
                     applyBestFitZoom();
                     adjustDropdownFontSize();
-                }, 120);
+                }, CONFIG.ORIENTATION_CHANGE_DELAY);
             });
         }
 
@@ -882,21 +961,59 @@
                 // Apply via CSS variable on the dropdown root
                 dropdown.style.setProperty('--dropdown-font-size', computed + 'px');
             } catch (e) {
-                // fail silently
+                // Log error in development, fail silently in production
+                if (console && console.warn) {
+                    console.warn('Error adjusting dropdown font size:', e);
+                }
             }
         }
 
         // Helper: check whether document is currently in fullscreen
         function isDocumentFullscreen() {
-            return !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+            return !!(
+                document.fullscreenElement || 
+                document.webkitFullscreenElement || 
+                document.mozFullScreenElement || 
+                document.msFullscreenElement
+            );
         }
+        
+        // Add keyboard support for dropdown
+        function setupKeyboardSupport() {
+            const dropdownHeader = document.getElementById('dropdown-header');
+            if (dropdownHeader) {
+                dropdownHeader.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.click();
+                    }
+                });
+            }
+        }
+        
+        // Global error handler
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error);
+            showStatus(`An error occurred: ${e.message}`, 5000);
+        });
+        
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Unhandled promise rejection:', e.reason);
+            showStatus(`An error occurred: ${e.reason}`, 5000);
+        });
         
         // Initialize when the page loads
         document.addEventListener('DOMContentLoaded', function() {
-            initEmulator();
-            setupMobileImprovements();
-            // initial dropdown sizing
-            adjustDropdownFontSize();
+            try {
+                initEmulator();
+                setupMobileImprovements();
+                setupKeyboardSupport();
+                // initial dropdown sizing
+                adjustDropdownFontSize();
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showStatus('Failed to initialize application', 5000);
+            }
         });
 
 

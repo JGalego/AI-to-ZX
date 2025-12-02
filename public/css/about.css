@@ -1,0 +1,109 @@
+/* About page specific styles */
+body {
+    font-family: Arial, sans-serif;
+    padding: 15px;
+    background: #111;
+    color: #eee;
+}
+
+.content {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: #1a1a1a;
+    padding: 18px;
+    border-radius: 8px;
+    color: #eee;
+    border: 1px solid #333;
+}
+
+/* Avoid awkward wrapping for long links */
+.content a {
+    word-break: break-word;
+    color: #4da6ff;
+    text-decoration: none;
+}
+
+.content a:hover {
+    text-decoration: underline;
+}
+
+/* When retro theme is active, let the retro stylesheet control colors */
+body.retro .content {
+    background: transparent;
+    color: var(--zx-paper, #eee);
+    border-radius: 0;
+    padding: 14px;
+    border: none;
+}
+
+.content h1 {
+    font-family: 'Press Start 2P', monospace;
+    color: #fff;
+}
+
+.content h2,
+.content h3 {
+    color: #ccc;
+}
+
+.back {
+    margin-bottom: 12px;
+    display: inline-block;
+    color: #4da6ff;
+    text-decoration: none;
+}
+
+.back:hover {
+    text-decoration: underline;
+}
+
+pre {
+    white-space: pre-wrap;
+}
+
+/* Improve code readability */
+code,
+kbd {
+    display: inline-block;
+    vertical-align: middle;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace;
+    font-size: 0.92rem;
+    line-height: 1.4;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: #e0e0e0;
+}
+
+pre {
+    display: block;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    overflow-x: auto;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    margin: 0.8em 0;
+}
+
+.image-container {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.image-container img {
+    max-width: 100%;
+    height: auto;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid #333;
+    color: #999;
+    font-size: 0.9em;
+}
+
+.footer a {
+    color: #4da6ff;
+}
