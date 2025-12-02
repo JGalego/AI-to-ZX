@@ -8,9 +8,9 @@ This project bridges the gap between retro computing nostalgia and modern AI con
 
 Programs are written in ZX BASIC, compiled to Z80 machine code, and run in a web-based emulator (JSSpeccy).
 
-**[📼 Try the demos online →](https://jgalego.github.io/AI-to-ZX/)**
+**[📼 Try the demos online →](https://ai-to-zx.com)**
 
-![](assets/images/zx_spectrum_enter.gif)
+![](public/assets/images/zx_spectrum_enter.gif)
 
 ## Prerequisites
 
@@ -59,7 +59,7 @@ To build and run this project locally, you'll need the following tools installed
 
 5. Open in the browser
 
-    ![](assets/images/ai_to_zx.png)
+    ![](public/assets/images/ai_to_zx.png)
 
 ## References
 
@@ -97,4 +97,4 @@ To build and run this project locally, you'll need the following tools installed
 * [ZXDB](https://github.com/zxdb/ZXDB) - open database with historical information about Sinclair machines
 * [ZXInfo](https://zxinfo.dk/) - a web-app for the ZXDB based search engine
 
-![](assets/images/zx_spectrum_graphics.gif)
+![](public/assets/images/zx_spectrum_graphics.gif)

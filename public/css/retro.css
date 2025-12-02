@@ -39,17 +39,18 @@ body.retro::before{
 
 /* Container styling */
 body.retro .container{
-    max-width:1100px;
-    margin:30px auto;
-    background:var(--zx-blue);
-    border:6px solid var(--zx-yellow);
+    max-width:100%;
+    margin:0;
+    background:var(--zx-black);
+    border:none;
     padding:22px;
     box-shadow:none;
+    min-height:100vh;
 }
 
 body.retro h1{
-    color:var(--zx-yellow);
-    text-shadow:2px 2px var(--zx-red);
+    color:var(--zx-bright-cyan);
+    text-shadow:2px 2px var(--zx-magenta);
     /* Use clamp so the title is readable on all devices */
     font-size: clamp(1.1rem, 3.5vw, 1.6rem);
     line-height:1.2;
@@ -57,29 +58,29 @@ body.retro h1{
 
 
 
-body.retro .intro-text{color:var(--zx-cyan); font-style:italic}
+body.retro .intro-text{color:var(--zx-yellow); font-style:italic}
 
 body.retro .emulator-container{background:var(--zx-black); border:4px solid var(--zx-magenta); display:flex; justify-content:center; align-items:center}
 
 body.retro .dropdown-header, body.retro .dropdown-options{
-    background:var(--zx-black);
+    background:var(--zx-blue);
     color:var(--zx-white);
     border:3px solid var(--zx-yellow);
     border-radius:0 !important;
 }
 
 body.retro .dropdown-category{background:var(--zx-magenta); color:var(--zx-yellow)}
-body.retro .dropdown-option{background:var(--zx-black); color:var(--zx-cyan)}
-body.retro .dropdown-option.selected, body.retro .dropdown-option:hover{background:var(--zx-blue); color:var(--zx-yellow)}
+body.retro .dropdown-option{background:var(--zx-blue); color:var(--zx-white)}
+body.retro .dropdown-option.selected, body.retro .dropdown-option:hover{background:var(--zx-magenta); color:var(--zx-yellow)}
 
 body.retro .load-button{background:var(--zx-green); color:var(--zx-black); border:3px solid var(--zx-yellow); font-family:inherit}
 body.retro .load-button:hover{background:var(--zx-yellow); color:var(--zx-red)}
 
-body.retro .instructions{background:var(--zx-black); color:var(--zx-bright-cyan); border-left:6px solid var(--zx-magenta); font-size: clamp(11px, 2.0vw, 13px); line-height:1.45}
+body.retro .instructions{background:var(--zx-blue); color:var(--zx-white); border-left:6px solid var(--zx-magenta); font-size: clamp(11px, 2.0vw, 13px); line-height:1.45}
 
 /* subtle responsive tweaks */
 @media (max-width:600px){
-    body.retro .container{margin:8px;padding:10px}
+    body.retro .container{margin:0;padding:10px}
     body.retro h1{font-size:1.1rem}
     body.retro .instructions { font-size: clamp(10px, 3.6vw, 12px); padding: 8px; }
 }
@@ -117,8 +118,8 @@ body.retro ol li::marker {
 /* Subsection titles (h2/h3) in retro mode: pink/magenta spectrum look */
 body.retro h2,
 body.retro h3 {
-    color: var(--zx-magenta) !important;
-    text-shadow: 1px 1px var(--zx-yellow);
+    color: var(--zx-yellow) !important;
+    text-shadow: 1px 1px var(--zx-red);
     font-size: clamp(0.9rem, 2.8vw, 1.1rem) !important;
     margin-top: 0.9em !important;
     margin-bottom: 0.6em !important;
